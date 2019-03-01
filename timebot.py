@@ -7,6 +7,12 @@ from user import *
 logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
 
+#TODO
+#implement sql stuff
+#implement commands to actually use the bot
+
+
+
 #global variables-------------------------------------------
 current_playing = []
 
@@ -50,11 +56,14 @@ async def on_member_update(before, after):
 		end = time.time() 
 		for user in current_playing:
 			# find current user in list of users playing games
+
 			if after.id == user.id and before.game.name == user.game: 
+
 				user.end = end # time user stopped playing the game
 				time_played = user.end - user.start # total time the game was played 
 				current_playing[user].end = end
 				print ("UPDATE: user %s played %s for %d seconds." % (user.name, before.game.name, time_played)) 
+
 				current_playing.remove(user)
 
 
