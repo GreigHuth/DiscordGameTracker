@@ -2,7 +2,7 @@
 import discord
 import logging
 import time
-from user import * 
+from user import *
 
 logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
