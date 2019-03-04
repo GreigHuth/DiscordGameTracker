@@ -8,8 +8,8 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
 
 #TODO
-#implement sql stuff
-#implement commands to actually use the bot
+#implement sql stuff[ ]
+#implement commands to actually use the bot[ ]
 
 
 
