@@ -3,7 +3,7 @@ import discord
 import logging
 import time
 from user import *
-from sql_functions import *
+from update_database import *
 
 logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
@@ -31,7 +31,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-	pass
+	
 
 
 @client.event
