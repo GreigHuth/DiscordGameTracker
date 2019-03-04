@@ -1,3 +1,4 @@
 #untracked files
 .venv
 __pycache__/
+gametime.db

@@ -3,6 +3,7 @@ import discord
 import logging
 import time
 from user import *
+from sql_functions import *
 
 logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
@@ -38,7 +39,7 @@ async def on_member_update(before, after):
 	if before.bot == True: # if the user is a bot ignore it
 		return
 
-	if before.game == None: # user has just started playing a game
+	if before.game == None: # a user has just started playing a game
 		print ("UPDATE: user %s has started playing %s." % (before.name, after.game.name))
 
 		id = before.id
@@ -50,7 +51,7 @@ async def on_member_update(before, after):
 		current_playing.append(user) # adds new user to list of people currently playing games
 	
 
-	elif after.game ==  None: # user has just stopped playing a game
+	elif after.game ==  None: # a user has just stopped playing a game
 		print ("UPDATE: user %s has stopped playing %s." %(after.name, before.game.name ))
 
 		end = time.time() 
@@ -61,9 +62,9 @@ async def on_member_update(before, after):
 
 				user.end = end # time user stopped playing the game
 				time_played = user.end - user.start # total time the game was played 
-				current_playing[user].end = end
-				print ("UPDATE: user %s played %s for %d seconds." % (user.name, before.game.name, time_played)) 
-
+				user.end = end
+				print ("UPDATE: user %s played %s for %d seconds." % (after.name, before.game.name, time_played)) 
+				update_database(user)
 				current_playing.remove(user)
 
 
