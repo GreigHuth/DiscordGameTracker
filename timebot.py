@@ -11,7 +11,14 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
 #TODO
 #implement sql stuff[x]
-#implement commands to actually use the bot[]
+#implement commands to actually use the bot[ ]
+#Add functionality to allow people to pm the bot and get thier own personal gametimes[]
+#make the overall bot more presentable[]
+#pitch to people[]
+#get a better name[]
+#get a profile pic[]
+#write some bloody documentation[]
+#neated up the code[]
 
 
 
@@ -20,7 +27,7 @@ current_playing = []
 
 
 # token for test server
-TOKEN = "NTM5MTQwNTExMjM2MzU4MTQ0.Dy-Bdg.ZEiEWfMm_ji1I0qdpbDqJDAJSog"
+TOKEN = "NTUyNTAxOTQ0MTQ1NDEyMDk2.D2AeCg.fT6rMT_-fzN2Ms9LcBZB6-3ucYE"
 
 
 client = discord.Client()
@@ -28,7 +35,7 @@ client = discord.Client()
 @client.event
 async def on_ready():
 	print("The bot is ready!")
-	await client.change_presence(game=discord.Game(name="tick, tock"))
+	await client.change_presence(game=discord.Game(name="E A R L Y  A C C E S S"))
 
 @client.event
 async def on_message(message):
@@ -42,7 +49,9 @@ async def on_member_update(before, after):
 	if before.bot == True: # if the user is a bot ignore it
 		return
 
-	if before.game == None: # a user has just started playing a game
+
+	if before.game == None and after.game != None : # a user has just started playing a game
+
 		print ("UPDATE: user %s has started playing %s." % (before.name, after.game.name))
 
 		id = before.id
@@ -54,7 +63,7 @@ async def on_member_update(before, after):
 		current_playing.append(user) # adds new user to list of people currently playing games
 	
 
-	elif after.game ==  None : # a user has just stopped playing a game
+	elif after.game == None and before.game != None : # a user has just stopped playing a game
 		print ("UPDATE: user %s has stopped playing %s." %(after.name, before.game.name ))
 
 		end = time.time() 
