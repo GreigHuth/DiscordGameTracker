@@ -17,12 +17,15 @@ def update_database(user):
 	#takes User class as input and uses that to update the corrensponding record in the database
 	
 	user_id = str(user.id)
-	game= user.game.replace(" ","")
+	game = user.game
+	game.lower()
+	game = user.game.replace(":"," ")
+	game = user.game.replace(" ","")
+	
 
 	while (True): #attempts to connect to db, if unsuccessful creates it then tries again
 		try:
 			conn = sqlite3.connect("gametime.db") #connection to db
-			print("Connected to gametime.db!")
 			break;
 
 		except: # if cant connect to db, make a new one
@@ -53,7 +56,6 @@ def update_gametime(user_id,conn,month, playtime, game):
 	
 	conn.execute('update '+month+' set '+game+'='+game+'+'+str(playtime)+' where ID=?',(user_id,))
 	conn.commit()
-	print("Gametime updated!")
 
 def add_new_game(game, conn, month):
 	conn.execute('alter table '+month+' add column '+game+' integer default 0')
