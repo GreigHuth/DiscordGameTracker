@@ -4,13 +4,14 @@ import logging
 import time
 from user import *
 from update_database import *
+from commands import * 
 
 logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
 
 #TODO
-#implement sql stuff[ ]
-#implement commands to actually use the bot[ ]
+#implement sql stuff[x]
+#implement commands to actually use the bot[]
 
 
 
@@ -31,6 +32,8 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+	pass
+
 	
 
 
@@ -51,7 +54,7 @@ async def on_member_update(before, after):
 		current_playing.append(user) # adds new user to list of people currently playing games
 	
 
-	elif after.game ==  None: # a user has just stopped playing a game
+	elif after.game ==  None : # a user has just stopped playing a game
 		print ("UPDATE: user %s has stopped playing %s." %(after.name, before.game.name ))
 
 		end = time.time() 

@@ -10,9 +10,12 @@ from user import *
 #Write code to make a new table when it becomes a new month[x]
 #Add code to create the database if there isnt one already[x]
 
+#global variables
+month = datetime.datetime.now().strftime("%B").upper()
+
 def update_database(user):
 	#takes User class as input and uses that to update the corrensponding record in the database
-	month = datetime.datetime.now().strftime("%B").upper()
+	
 	user_id = str(user.id)
 	game= user.game.replace(" ","")
 
