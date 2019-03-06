@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+import re
 from user import *
 # all the functions that deal with the sql database will be in here
 
@@ -18,11 +19,9 @@ def update_database(user):
 	
 	user_id = str(user.id)
 	game = user.game
-	game.lower()
-	game = user.game.replace(":"," ")
-	game = user.game.replace(" ","")
+	re.sub(r'\W+','',game)
 	
-
+	
 	while (True): #attempts to connect to db, if unsuccessful creates it then tries again
 		try:
 			conn = sqlite3.connect("gametime.db") #connection to db
@@ -54,7 +53,7 @@ def update_database(user):
 
 def update_gametime(user_id,conn,month, playtime, game):
 	
-	conn.execute('update '+month+' set ?=?+'+str(playtime)+' where ID=?',(game,game,user_id,))
+	conn.execute('update '+month+' set '+game+'='+game+'+'+str(playtime)+' where ID=?',(user_id,))
 	conn.commit()
 
 def add_new_game(game, conn, month):
