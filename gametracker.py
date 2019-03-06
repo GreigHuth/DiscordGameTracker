@@ -1,7 +1,10 @@
 #bot to keep track of how many and how often games are played on discord
+#made by gurg
 import discord
+import sys
 import logging
 import time
+from config import *
 from user import *
 from update_database import *
 from commands import * 
@@ -11,31 +14,30 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
 #TODO
 #implement sql stuff[x]
-#implement commands to actually use the bot[ ]
+#implement commands to actually use the bot[x]
 #Add functionality to allow people to pm the bot and get thier own personal gametimes[]
 #make the overall bot more presentable[]
 #pitch to people[]
-#get a better name[]
-#get a profile pic[]
-#write some bloody documentation[]
-#neated up the code[]
+#get a better name[x]
+#get a profile pic[x]
+#write some bloody documentation[x]
+#neaten up the code[]
 
 
 
 #global variables-------------------------------------------
 current_playing = []
 
-
-# token for test server
-TOKEN = "NTUyNTAxOTQ0MTQ1NDEyMDk2.D2AeCg.fT6rMT_-fzN2Ms9LcBZB6-3ucYE"
-
-
+if TOKEN ==  "":
+	print ("TOKEN not found, please add it in the config.py file.")
+	sys.exit(0)
+	
 client = discord.Client()
 
 @client.event
 async def on_ready():
 	print("The bot is ready!")
-	await client.change_presence(game=discord.Game(name="E A R L Y  A C C E S S"))
+	await client.change_presence(game=discord.Game(name="V E R S I O N 1.0"))
 
 @client.event
 async def on_message(message):

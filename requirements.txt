@@ -1,0 +1,7 @@
+aiohttp==1.0.5
+async-timeout==3.0.1
+chardet==3.0.4
+discord==0.16.12
+discord.py==0.16.12
+multidict==4.5.2
+websockets==3.4
