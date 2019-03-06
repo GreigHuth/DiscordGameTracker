@@ -21,16 +21,17 @@ def top_games(limit):
 		
 
 	totals = map(lambda x: x/3600, totals) # converts all the totals to hours
+
 	game_totals = list(zip(games,totals)) #zips totals with the games then turns it back into a list because it works
 
 	game_totals = sorted(game_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
 
-	game_totals = game_totals[:limit] # only returns top 5
-	message = "Top 5 games played in %s (in hours):\n```" % month
+	game_totals = game_totals[:limit] # returns either 10 or 5
+
+	message = "Top %d games played in %s :\n```" % (limit, month.lower())
 	for game in game_totals:
 
 		message += ' %s - {0:.2f} hours played\n'.format(game[1]) % game[0]
-
 
 	message += '```'
 
