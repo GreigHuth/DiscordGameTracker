@@ -4,7 +4,7 @@ import datetime
 from operator import itemgetter
 
 
-def top_games():
+def top_games(limit):
 	month = datetime.datetime.now().strftime("%B").upper()
 
 	conn = sqlite3.connect("gametime.db")
@@ -25,7 +25,7 @@ def top_games():
 
 	game_totals = sorted(game_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
 
-	game_totals = game_totals[:5] # only returns top 5
+	game_totals = game_totals[:limit] # only returns top 5
 	message = "Top 5 games played in %s (in hours):\n```" % month
 	for game in game_totals:
 

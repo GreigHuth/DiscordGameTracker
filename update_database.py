@@ -20,7 +20,6 @@ def update_database(user):
 	user_id = str(user.id)
 	game = user.game
 	game = re.sub(r'\W+','',game)
-	print(game)
 	
 	while (True): #attempts to connect to db, if unsuccessful creates it then tries again
 		try:

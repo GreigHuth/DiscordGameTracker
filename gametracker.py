@@ -41,8 +41,11 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-	if message.content == "!topgames":
-		await client.send_message(message.channel, top_games())
+	if message.content == "!topgames5":
+		await client.send_message(message.channel, top_games(5))
+
+	if message.content == "!topgames10":
+		await client.send_message(message.channel, top_games(10))
 
 	if message.content == "!help":
 		await client.send_message(message.channel, " i need somebody.(only command is !topgames)")
