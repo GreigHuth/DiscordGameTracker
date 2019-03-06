@@ -54,7 +54,7 @@ def update_database(user):
 
 def update_gametime(user_id,conn,month, playtime, game):
 	
-	conn.execute('update '+month+' set '+game+'='+game+'+'+str(playtime)+' where ID=?',(user_id,))
+	conn.execute('update '+month+' set ?=?+'+str(playtime)+' where ID=?',(game,game,user_id,))
 	conn.commit()
 
 def add_new_game(game, conn, month):
