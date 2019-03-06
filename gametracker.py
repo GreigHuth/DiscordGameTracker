@@ -55,10 +55,9 @@ async def on_member_update(before, after):
 	if before.bot == True: # if the user is a bot ignore it
 		return
 
-
 	if before.game == None and after.game != None : # a user has just started playing a game
-
-		print ("UPDATE: user %s has started playing %s." % (before.name, after.game.name))
+		time = time.strftime("%H:%M:%S")
+		print ("%s: user %s has started playing %s." % (time, before.name, after.game.name))
 
 		id = before.id
 		game = after.game.name 
@@ -70,7 +69,6 @@ async def on_member_update(before, after):
 	
 
 	elif after.game == None and before.game != None : # a user has just stopped playing a game
-		print ("UPDATE: user %s has stopped playing %s." %(after.name, before.game.name ))
 
 		end = time.time() 
 		for user in current_playing:
@@ -81,7 +79,7 @@ async def on_member_update(before, after):
 				user.end = end # time user stopped playing the game
 				time_played = user.end - user.start # total time the game was played 
 				user.end = end
-				print ("UPDATE: user %s played %s for %d seconds." % (after.name, before.game.name, time_played)) 
+				print ("%s: user %s played %s for %d seconds." % (time,after.name, before.game.name, time_played)) 
 				update_database(user)
 				current_playing.remove(user)
 
