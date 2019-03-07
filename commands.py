@@ -3,6 +3,8 @@ import sqlite3
 import datetime
 from operator import itemgetter
 
+#TODO
+
 
 def top_games(limit):
 	month = datetime.datetime.now().strftime("%B").upper()
@@ -12,6 +14,9 @@ def top_games(limit):
 	
 	games = [game[0] for game in cursor.description] # list comprehension that puts all the column names into a list
 	games.pop(0)
+
+	# need to hard code to remove spotify
+	games.remove("Spotify")
 
 	totals = [0]*len(games)
 	for i in range(len(games)): # puts all the totals in a  list
