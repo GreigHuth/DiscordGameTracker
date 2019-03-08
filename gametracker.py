@@ -53,11 +53,13 @@ async def on_message(message):
 
 @client.event
 async def on_member_update(before, after):
+	c_time = time.strftime("%H:%M:%S") #current time
+
 	if before.bot == True: # if the user is a bot ignore it
 		return
 
 	if before.game == None and after.game != None : # a user has just started playing a game
-		c_time = time.strftime("%H:%M:%S")
+		
 		print ("%s: user %s has started playing %s." % (c_time, before.name, after.game.name))
 
 		id = before.id
@@ -80,7 +82,7 @@ async def on_member_update(before, after):
 				user.end = end # time user stopped playing the game
 				time_played = user.end - user.start # total time the game was played 
 				user.end = end
-				print ("%s: user %s played %s for %d seconds." % (time,after.name, before.game.name, time_played)) 
+				print ("%s: user %s played %s for %d seconds." % (c_time,after.name, before.game.name, time_played)) 
 				update_database(user)
 				current_playing.remove(user)
 
