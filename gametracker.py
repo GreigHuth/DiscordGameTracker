@@ -22,6 +22,7 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 #get a profile pic[x]
 #write some bloody documentation[x]
 #neaten up the code[]
+#implement commands better[]
 
 
 
@@ -48,7 +49,7 @@ async def on_message(message):
 		await client.send_message(message.channel, top_games(10))
 
 	if message.content == "!help":
-		await client.send_message(message.channel, " i need somebody.(only command is !topgames)")
+		await client.send_message(message.channel, " i need somebody.(only command is !topgames(5|10))")
 
 @client.event
 async def on_member_update(before, after):
@@ -56,8 +57,8 @@ async def on_member_update(before, after):
 		return
 
 	if before.game == None and after.game != None : # a user has just started playing a game
-		time = time.strftime("%H:%M:%S")
-		print ("%s: user %s has started playing %s." % (time, before.name, after.game.name))
+		c_time = time.strftime("%H:%M:%S")
+		print ("%s: user %s has started playing %s." % (c_time, before.name, after.game.name))
 
 		id = before.id
 		game = after.game.name 
