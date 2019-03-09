@@ -19,11 +19,11 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 #make the overall bot more presentable[]
 #pitch to people[]
 #get a better name[x]
-#get a profile pic[x]
+#get a profile pic[]
 #write some bloody documentation[x]
 #neaten up the code[]
-#implement commands better[]
-
+#changed it so it displays the start and stop messages in different colours[]
+#implent a way to gradually add times to db[]
 
 
 #global variables-------------------------------------------
