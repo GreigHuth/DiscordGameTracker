@@ -60,7 +60,7 @@ async def on_member_update(before, after):
 
 	if before.game == None and after.game != None : # a user has just started playing a game
 		
-		print ("\033[1;32;40m %s: user %s has started playing %s." % (c_time, before.name, after.game.name))
+		print ("\033[1;32;40m%s: user %s has started playing %s." % (c_time, before.name, after.game.name))
 		#The thing at the start makes the text green
 
 		id = before.id
@@ -83,7 +83,7 @@ async def on_member_update(before, after):
 				user.end = end # time user stopped playing the game
 				time_played = user.end - user.start # total time the game was played 
 				user.end = end
-				print ("\033[1;31;40m %s: user %s played %s for %d seconds." % (c_time,after.name, before.game.name, time_played)) 
+				print ("\033[1;31;40m%s: user %s played %s for %d seconds." % (c_time,after.name, before.game.name, time_played)) 
 				# thing at the start makes text red
 				update_database(user)
 				current_playing.remove(user)
