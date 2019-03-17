@@ -27,7 +27,8 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
 
 #global variables-------------------------------------------
-current_playing = []
+current_playing = [] # 
+current_users = [] # list of just the users, makes it easy to check if they are playing something already
 
 if TOKEN ==  "":
 	print ("TOKEN not found, please add it in the config.py file.")
@@ -49,7 +50,7 @@ async def on_message(message):
 		await client.send_message(message.channel, top_games(10))
 
 	if message.content == "!help":
-		await client.send_message(message.channel, " i need somebody.(only command is !topgames(5|10))")
+		await client.send_message(message.channel, " i need somebody.(only command is ```!topgames(5|10))```")
 
 @client.event
 async def on_member_update(before, after):
@@ -58,7 +59,8 @@ async def on_member_update(before, after):
 	if before.bot == True: # if the user is a bot ignore it
 		return
 
-	if before.game == None and after.game != None : # a user has just started playing a game
+	if before.game == None and after.game != None and before.id not in current_users : 
+		#checks to see if user has started playing a game and is not already playing one
 		
 		print ("\033[1;32;40m %s: user %s has started playing %s." % (c_time, before.name, after.game.name))
 		#The thing at the start makes the text green
@@ -68,6 +70,7 @@ async def on_member_update(before, after):
 		start = time.time()
 		end = None
 
+		current_users.append(id) # add id to list of people currently playing games
 		user= User(id, game, start, end) #creates new user
 		current_playing.append(user) # adds new user to list of people currently playing games
 	
@@ -83,9 +86,13 @@ async def on_member_update(before, after):
 				user.end = end # time user stopped playing the game
 				time_played = user.end - user.start # total time the game was played 
 				user.end = end
+
 				print ("\033[1;31;40m %s: user %s played %s for %d seconds." % (c_time,after.name, before.game.name, time_played)) 
 				# thing at the start makes text red
+
 				update_database(user)
+				
+				current_users.remove(after.id)
 				current_playing.remove(user)
 
 
