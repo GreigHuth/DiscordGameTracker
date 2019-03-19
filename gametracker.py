@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 #get a profile pic[]
 #write some bloody documentation[x]
 #neaten up the code[]
-#changed it so it displays the start and stop messages in different colours[]
+#changed it so it displays the start and stop messages in different colours[x]
 #implent a way to gradually add times to db(say every 10 mins)[]
 
 
@@ -43,14 +43,15 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-	if message.content == "!topgames5":
-		await client.send_message(message.channel, top_games(5))
 
-	if message.content == "!topgames10":
+	if message.content == "!topgames10" or message.content == "!topgames":
 		await client.send_message(message.channel, top_games(10))
 
+	if message.content == "!topgamesALL"
+		await client.send_message(mesage.channel, top_games(0))
+
 	if message.content == "!help":
-		await client.send_message(message.channel, " i need somebody.(only command is ```!topgames(5|10))```")
+		await client.send_message(message.channel, " i need somebody.(only command is ```!topgames10```")
 
 @client.event
 async def on_member_update(before, after):

@@ -31,7 +31,8 @@ def top_games(limit):
 
 	game_totals = sorted(game_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
 
-	game_totals = game_totals[:limit] # returns either 10 or 5
+	if limit > 0:
+	 	game_totals = game_totals[:limit] # only displays the number of games desired
 
 	message = "Top %d games played in %s :\n```" % (limit, month.lower())
 	for game in game_totals:
