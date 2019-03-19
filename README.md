@@ -1,11 +1,11 @@
 # GameTracker Bot
 
-GameTracker bot is a bot that keeps track of all the games being played by different people in your discord server and long they 
+GameTracker bot is a bot that keeps track of all the games being played by different people in your discord server and how long they 
 have been played for on a month by month basis.
 
 EXAMPLE:
 ```
-discord_user: !topgames
+discord_user: !topgames5
 
 GameTracker:  Top 5 games played in MARCH (in hours):
               ApexLegends - 18.77 hours played
@@ -23,7 +23,7 @@ GameTracker was built to achieve two things:
 2. To allow users to make decisions on what to play based on what the other people in the server are playing.
 
 ## Current Commands:  
-`!topgames` - Does the above.  
+`!topgames10 or !topgames5` - Displays the top 10 or top 5 games played that month.  
 `!help` -  Says a little joke then informs the user that !topgames is the only command.
 
 ## Prerequisites
