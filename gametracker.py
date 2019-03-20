@@ -47,7 +47,7 @@ async def on_message(message):
 	if message.content == "!topgames10" or message.content == "!topgames":
 		await client.send_message(message.channel, top_games(10))
 
-	if message.content == "!topgamesALL"
+	if message.content == "!topgamesALL":
 		await client.send_message(mesage.channel, top_games(0))
 
 	if message.content == "!help":
