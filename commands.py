@@ -40,10 +40,10 @@ def top_games(limit):
             message += '%s - {0:.2f} hours\n\n'.format(game[1]) % game[0]
 
     else:   
-        game_totals = game_totals[70]
+        game_totals = game_totals[:70]
         
         for game in game_totals:
-            message += '%s-{0:.2f} hours\n'.format(game[1]) % game[0]
+            message += '%s -{0:.2f}hours\n'.format(game[1]) % game[0]
 
     message += '```'
 
