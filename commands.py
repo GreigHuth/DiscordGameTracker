@@ -16,7 +16,8 @@ def top_games(limit):
     games.pop(0)
 
     # need to hard code to remove spotify
-    games.remove("Spotify")
+    if "Spotify" in games:
+        games.remove("Spotify")
 
     totals = [0]*len(games)
     for i in range(len(games)): # puts all the totals in a  list
@@ -32,6 +33,7 @@ def top_games(limit):
     game_totals = sorted(game_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
 
     message = "Top %d games played in %s:\n```" % (limit, month.lower())
+
 
     if limit > 0:
         game_totals = game_totals[:limit] # only displays the number of games desired
