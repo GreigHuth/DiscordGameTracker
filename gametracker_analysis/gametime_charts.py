@@ -6,12 +6,12 @@ import sqlite3
 import sys
 from operator import itemgetter
 
+month = sys.argv[1]
     
 def gametime_bar():
     plt.rcdefaults()
     fig, ax = plt.subplots(figsize=(30,20))
 
-    month = sys.argv[1]
     games = get_gametimes(month)[:100] #gets top 100 games
 
     names = [game[0] for game in games]
@@ -28,7 +28,7 @@ def gametime_bar():
     ax.set_yticklabels(names)
     ax.invert_yaxis()
     ax.set_xlabel('Time Played (Hours)')
-    ax.set_title("Game Tracker Data for March")
+    ax.set_title("Game Tracker Data for %s" % month)
 
     plt.savefig('gt_march_bar.png')
 
