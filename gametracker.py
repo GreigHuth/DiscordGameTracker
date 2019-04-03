@@ -56,7 +56,6 @@ async def on_message(message):
     regex = re.search("!topgames|help(\s)?.*(\s)?[a-z]*", message.content) # matches message to regex, if no match then ignore
     
     if regex == None :
-        print ("invalid command entered")
         return
 
     split_message = message.content.split() # splits message into command and then parameters
