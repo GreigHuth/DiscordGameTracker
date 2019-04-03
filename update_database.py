@@ -16,7 +16,6 @@ month = datetime.datetime.now().strftime("%B").upper()
 
 def update_database(user):
 	#takes User class as input and uses that to update the corrensponding record in the database
-	
 	user_id = str(user.id)
 	game = user.game
 	game = re.sub(r'\W+','',game)
