@@ -32,7 +32,7 @@ def top_users(channel, limit = 10, month = datetime.datetime.now().strftime("%B"
 
     user_totals = list(zip(users,totals))
 
-    user_totals = sorted(game_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
+    user_totals = sorted(user_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
 
     #begin constructing message
 
