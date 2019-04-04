@@ -8,7 +8,8 @@ import re
 from config import *
 from user import *
 from update_database import *
-from commands import * 
+from commands.topgames import top_games
+from commands.topusers import top_users
 
 logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
@@ -17,12 +18,9 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 #implement sql stuff[x]
 #implement commands to actually use the bot[x]
 #Add functionality to allow people to pm the bot and get thier own personal gametimes[]
-#make the overall bot more presentable[]
-#pitch to people[]
+#Add commands so people can query gametimes about specific games[]
 #get a better name[x]
 #get a profile pic[]
-#write some bloody documentation[x]
-#neaten up the code[]
 #changed it so it displays the start and stop messages in different colours[x]
 #implent a way to gradually add times to db(say every 10 mins)[]
 
@@ -53,14 +51,14 @@ async def on_message(message):
     if message.author.id == client.user.id: # dont trigger on own messages
         return
 
-    regex = re.search("!topgames|help(\s)?.*(\s)?[a-z]*", message.content) # matches message to regex, if no match then ignore
+    regex = re.search("!topgames|help|topusers(\s)?.*(\s)?[a-z]*", message.content) # matches message to regex, if no match then ignore
     
     if regex == None :
         return
 
     split_message = message.content.split() # splits message into command and then parameters
     
-    output = handle_input(split_message)
+    output = handle_input(split_message, message.channel)
 
     await client.send_message(message.channel, output)
 
@@ -111,8 +109,10 @@ async def on_member_update(before, after):
 
 
 
-def handle_input(split_message):
+def handle_input(split_message,channel):
     # hacky icky code pls ignore
+
+    #-----------------------------topgames---------------------------------------
     if split_message[0] == "!topgames":
 
         if len(split_message) == 3:
@@ -137,8 +137,35 @@ def handle_input(split_message):
         else: 
             output = "incorrect number of parameters"
 
+    #--------------------------------help----------------------------------------
     elif split_message[0] == "!help":
         output = " `!topgames [limit] [month]`"
+
+
+    #--------------------------------topusers------------------------------------
+    if split_message[0] == "!topusers":
+
+        if len(split_message) == 3:
+            limit = split_message[1]
+            month = split_message[2]
+            if month not in months:
+                output = "invalid month"
+            else:
+                output = top_users(channel,limit, month)
+
+        elif len(split_message) == 2: 
+            if split_message[1].lower() in months:
+                month = split_message[1]
+                output = top_users(channel,month = month)
+            else:
+                limit = split_message[1]
+                output = top_users(channel,limit)
+
+        elif len(split_message) == 1:
+            output = top_users(channel)
+
+        else: 
+            output = "incorrect number of parameters" 
 
     return output
 

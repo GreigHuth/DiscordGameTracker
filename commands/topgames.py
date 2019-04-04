@@ -1,9 +1,7 @@
-# code to handle the different commands given to the bot
+# code for the topgames command, returns the top games played with respect to certain parameters
 import sqlite3
 import datetime
 from operator import itemgetter
-
-#TODO
 
 
 def top_games(limit = 10, month = datetime.datetime.now().strftime("%B").upper()): 
