@@ -11,10 +11,12 @@ def top_users(channel, limit = 10, month = datetime.datetime.now().strftime("%B"
     cursor = conn.execute('select ID from '+month) # get all user ids
     users = [user[0] for user in cursor.fetchall()]
 
-    print (users)
     cursor = conn.execute('select * from '+month)
     games = [game[0] for game in cursor.description] #get list of games
     games.pop(0) 
+
+    if "Spotify" in games:
+        games.remove("Spotify")
 
     totals = [0]*len(games)
     for user in users:
@@ -29,6 +31,8 @@ def top_users(channel, limit = 10, month = datetime.datetime.now().strftime("%B"
     totals = map(lambda x: x/3600, totals)
 
     user_totals = list(zip(users,totals))
+
+    user_totals = sorted(game_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
 
     #begin constructing message
 
