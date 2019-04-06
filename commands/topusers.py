@@ -18,14 +18,14 @@ def top_users(channel, limit = 10, month = datetime.datetime.now().strftime("%B"
     if "Spotify" in games:
         games.remove("Spotify")
 
-    totals = [0]*len(games)
-    i = 0
-    for user in users:
+    totals = [0]*len(users)
+    
+    for i in range(len(users)):
         for game in games:
-            cursor = conn.execute('select '+game+' from '+month+' where ID = '+user)
+            cursor = conn.execute('select '+game+' from '+month+' where ID = '+users[i])
             totals[i] += cursor.fetchone()[0]
-
-        i += i + 1
+        
+        
 
 
     totals = map(lambda x: x/3600, totals)
