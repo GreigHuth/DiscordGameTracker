@@ -29,6 +29,8 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 current_playing = [] # 
 current_users = [] # list of just the users, makes it easy to check if they are playing something already
 months = []
+
+
 for i in range(1,13):
     months.append(datetime.date(2008, i, 1).strftime('%B').lower())
 

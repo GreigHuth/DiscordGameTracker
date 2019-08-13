@@ -30,7 +30,7 @@ def gametime_bar():
     ax.set_xlabel('Time Played (Hours)')
     ax.set_title("Game Tracker Data for %s" % month)
 
-    plt.savefig('gt_march_bar.png')
+    plt.savefig('gt_april_bar.svg')
 
 def get_gametimes(month):
 
