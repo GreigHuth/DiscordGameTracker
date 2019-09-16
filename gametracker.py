@@ -49,11 +49,11 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-
+    
     if message.author.id == client.user.id: # dont trigger on own messages
         return
 
-    regex = re.search("!topgames|help|topusers(\s)?.*(\s)?[a-z]*", message.content) # matches message to regex, if no match then ignore
+    regex = re.search("!mygames|topgames|help|topusers(\s)?.*(\s)?[a-z]*", message.content) # matches message to regex, if no match then ignore
     
     if regex == None :
         return
@@ -142,6 +142,10 @@ def handle_input(split_message,channel):
     #--------------------------------help----------------------------------------
     elif split_message[0] == "!help":
         output = " `!topgames [limit] [month]`"
+
+
+    if split_message[0] == "!mygames":
+        output ==  split_message[0]
 
 
     #--------------------------------topusers------------------------------------
