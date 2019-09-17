@@ -3,9 +3,9 @@ from discord.utils import find
 import datetime
 from operator import itemgetter
 
-def top_users(channel, limit = 10, month = datetime.datetime.now().strftime("%B").upper()):
+def topusers(month, channel):
 
-
+    
     conn = sqlite3.connect("gametime.db")
     
     cursor = conn.execute('select ID from '+month) # get all user ids
@@ -36,22 +36,15 @@ def top_users(channel, limit = 10, month = datetime.datetime.now().strftime("%B"
 
     #begin constructing message
 
-    message = "Top %s gamerz in %s:\n```" % (limit, month.lower())
+    message = "Top %s gamerz in %s:\n```" % ("10", month.lower())
 
-    if limit == "ALL":
-        user_totals = user_totals[:70]
-        
-        for user in user_totals:
-            member = find(lambda m: m.id == user[0], channel.server.members)
-            message += '%s -{0:.2f}hours\n'.format(user[1]) % member.display_name
+   
+    user_totals = user_totals[:10] # only displays the number of games desired
 
-    else:
-        user_totals = user_totals[:int(limit)] # only displays the number of games desired
+    for user in user_totals:
 
-        for user in user_totals:
-
-            member = find(lambda m: m.id == user[0], channel.server.members)
-            message += '%s - {0:.2f} hours\n\n'.format(user[1]) % member.display_name
+        member = find(lambda m: m.id == user[0], channel.server.members)
+        message += '%s - {0:.2f} hours\n\n'.format(user[1]) % member.display_name
 
 
     message += '```'

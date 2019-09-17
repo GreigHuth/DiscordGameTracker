@@ -5,11 +5,10 @@ import sys
 import logging
 import time
 import re
-from config import *
+from config  import *
 from user import *
-from update_database import *
-from commands.topgames import top_games
-from commands.topusers import top_users
+from database_stuff.update_database import update_database
+from generate_output import generate_output
 
 logging.basicConfig(level=logging.INFO)#logs errors and debug info
 
@@ -28,17 +27,13 @@ logging.basicConfig(level=logging.INFO)#logs errors and debug info
 #global variables-------------------------------------------
 current_playing = [] # 
 current_users = [] # list of just the users, makes it easy to check if they are playing something already
-months = []
 
-
-for i in range(1,13):
-    months.append(datetime.date(2008, i, 1).strftime('%B').lower())
 
 if TOKEN ==  "":
     print ("TOKEN not found, please add it in the config.py file.")
     sys.exit(0)
 
-    
+
 client = discord.Client()
 
 @client.event
@@ -53,14 +48,14 @@ async def on_message(message):
     if message.author.id == client.user.id: # dont trigger on own messages
         return
 
-    regex = re.search("!mygames|topgames|help|topusers(\s)?.*(\s)?[a-z]*", message.content) # matches message to regex, if no match then ignore
+    regex = re.search("![a-z]+((\s)?[a-z]*)?", message.content) # matches message to regex, if no match then ignore
     
     if regex == None :
         return
 
-    split_message = message.content.split() # splits message into command and then parameters
+    split_input = message.content.split()
     
-    output = handle_input(split_message, message.channel)
+    output = generate_output(split_input, message)
 
     await client.send_message(message.channel, output)
 
@@ -111,69 +106,6 @@ async def on_member_update(before, after):
 
 
 
-def handle_input(split_message,channel):
-    # hacky icky code pls ignore
-
-    #-----------------------------topgames---------------------------------------
-    if split_message[0] == "!topgames":
-
-        if len(split_message) == 3:
-            limit = split_message[1]
-            month = split_message[2]
-            if month not in months:
-                output = "invalid month"
-            else:
-                output = top_games(limit, month)
-
-        elif len(split_message) == 2: 
-            if split_message[1].lower() in months:
-                month = split_message[1]
-                output = top_games(month = month)
-            else:
-                limit = split_message[1]
-                output = top_games(limit)
-
-        elif len(split_message) == 1:
-            output = top_games()
-
-        else: 
-            output = "incorrect number of parameters"
-
-    #--------------------------------help----------------------------------------
-    elif split_message[0] == "!help":
-        output = " `!topgames [limit] [month]`"
-
-
-    if split_message[0] == "!mygames":
-        output ==  split_message[0]
-
-
-    #--------------------------------topusers------------------------------------
-    if split_message[0] == "!topusers":
-
-        if len(split_message) == 3:
-            limit = split_message[1]
-            month = split_message[2]
-            if month not in months:
-                output = "invalid month"
-            else:
-                output = top_users(channel,limit, month)
-
-        elif len(split_message) == 2: 
-            if split_message[1].lower() in months:
-                month = split_message[1]
-                output = top_users(channel,month = month)
-            else:
-                limit = split_message[1]
-                output = top_users(channel,limit)
-
-        elif len(split_message) == 1:
-            output = top_users(channel)
-
-        else: 
-            output = "incorrect number of parameters" 
-
-    return output
 
     
 

@@ -3,7 +3,6 @@ from discord.utils import find
 import datetime
 from operator import itemgetter
 
-
 #command that lets people see thier own personal gametimes
 def mygames(id, month):
 
@@ -11,7 +10,7 @@ def mygames(id, month):
 
     cursor = conn.execute('select * from ' +month+ ',where ID = ' +id)
     times = [time[0] for time in cursor.description]
-    time.pop(0)
+    times.pop(0)
 
     cursor = conn.execute('select * from '+month)
     games = [game[0] for game in cursor.description]
@@ -31,9 +30,9 @@ def mygames(id, month):
     message = "Top games for YOU in %s:\n```" %(month.lower())
     
     for game in game_times:
-        message += "%s - {0:.2f}hours\n".format(game[1]) % game[0])
+        message += "%s - {0:.2f}hours\n".format(game[1]) % game[0]
 
-    
+    return message
 
 
 
