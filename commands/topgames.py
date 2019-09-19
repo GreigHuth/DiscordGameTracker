@@ -22,10 +22,9 @@ def topgames(month):
     for i in range(len(games)): # puts all the totals in a  list
         
        cursor = conn.execute('select sum('+games[i]+') from '+month)
-       totals[i] = cursor.fetchone()[0]# converts total to int
-        
-
+       totals[i] = cursor.fetchone()[0]# converts total to int   
     totals = map(lambda x: x/3600, totals) # converts all the totals to hours
+
 
     game_totals = list(zip(games,totals)) #zips totals with the games then turns it back into a list because it works
     game_totals = [i for i in game_totals if i[0] != "Spotify" ]# remove spotify
@@ -33,15 +32,10 @@ def topgames(month):
     game_totals = game_totals[:10] # only displays top ten games
 
 
-
-
     # begin constructing message
-    message = "Top %s games played in %s:\n```" % ("10", month.lower())
-       
+    message = "Top %s games played in %s:\n```" % ("10", month.lower())    
     for game in game_totals:
         message += '%s - {0:.2f} hours\n\n'.format(game[1]) % game[0]
-
-
     message += '```'
 
     
