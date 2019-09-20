@@ -48,7 +48,7 @@ async def on_message(message):
     if message.author.id == client.user.id: # dont trigger on own messages
         return
 
-    regex = re.search("![a-z]+((\s)?[a-z]*)?", message.content) # matches message to regex, if no match then ignore
+    regex = re.search("^![a-z]+((\s)?[a-z]*)?", message.content) # matches message to regex, if no match then ignore
     
     if regex == None :
         return
