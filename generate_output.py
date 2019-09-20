@@ -1,6 +1,7 @@
 from commands.topgames import topgames
 from commands.topusers import topusers
 from commands.mygames import mygames
+import re
 import sys
 import  datetime
 
@@ -15,6 +16,7 @@ def generate_output(split_message, message):
     except  IndexError:
         month =  datetime.datetime.now().strftime("%B").upper()
 
+    month = re.sub(r'\W+', '', month)
 
     if split_message[0] not in  ["!topgames", "!topusers", "!help", "!mygames"]:
         output_message = "Invalid command. Try '!help'. " 
