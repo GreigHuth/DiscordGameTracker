@@ -45,7 +45,8 @@ async def on_ready():
 @client.event
 async def on_message(message):
     
-    if message.author.id == client.user.id: # dont trigger on own messages
+
+    if message.author.id == client.user.id: # dont trigger on own messages, redundant? yeah but i cba testing
         return
 
     regex = re.search("^![a-z]+((\s)?[a-z]*)?", message.content) # matches message to regex, if no match then ignore
