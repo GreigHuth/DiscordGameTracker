@@ -30,7 +30,7 @@ def mygames(user_id, month):
     #begin constructing message
     message = "Top games for YOU in %s:\n```" %(month.lower()) 
     for game, time  in game_totals:
-        message += "%s - {0:.2f}hours \n".format(time) % game
+        message += "%s - {0:.2f}hours \n\n".format(time) % game
     message += '```'
 
     return message
