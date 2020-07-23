@@ -5,7 +5,7 @@ import sys
 import logging
 import time
 import re
-from config  import *
+from config.config import TOKEN 
 from user import *
 from database_stuff.update_database import update_database
 from generate_output import generate_output
