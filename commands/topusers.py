@@ -39,5 +39,4 @@ def topusers(month, channel):
         message += '%s - {0:.2f} hours\n\n'.format(user[1]) % member.display_name
     message += '```'
 
-    
     return message

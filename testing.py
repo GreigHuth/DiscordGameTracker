@@ -7,7 +7,6 @@ import time
 import re
 from config.config import TOKEN 
 from user import *
-from database_stuff.update_database import update_database
 from generate_output import generate_output
 
 logging.basicConfig(level=logging.INFO)#logs errors and debug info
@@ -33,8 +32,7 @@ if TOKEN ==  "":
     print ("TOKEN not found, please add it in the config.py file.")
     sys.exit(0)
 
-#given a tuple of activities the function will return the relevant Game object if the 
-#   user is playing a game and return nothing otherwise
+
 def find_game(activities):
 
     # if the activities is a tuple check all the elements to work out if one of them is a game
@@ -73,13 +71,23 @@ async def on_message(message):
     
     if message.content == "test":
 
-        output = isinstance(message.author.activities[0], discord.Game)
-
-        await message.channel.send(output)
+        try:
+            print(message.author.activities[0])
+        except IndexError:
+            print("not playing anything")
+        else:
+            output = isinstance(message.author.activities[0], discord.Game)
+            await message.channel.send(output)
+        
+        
 
     if message.content == "test-fg":
 
-        print(find_game(message.author.activities))
+        if find_game(message.author.activities):
+            print(type(find_game(message.author.activities)))
+        else: 
+            print("not playing a game")
+
 
 #write a function that updates the database with info 
     

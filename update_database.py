@@ -1,7 +1,7 @@
 import sqlite3
 import datetime
+import time
 import re
-from user import *
 # all the functions that deal with the sql database will be in here
 
 #TODO
@@ -13,58 +13,50 @@ from user import *
 
 #NOTE: month being called all the time looks messy but its necessary so the bot doesnt need to be restarted all the time
 
-def update_database(user):
+def update_database(cp, conn):
 	now = datetime.datetime.now()
 	month = now.strftime("%B").upper()
 	year = now.strftime("%Y")
 
-	#takes User class as input and uses that to update the corrensponding record in the database
-	game = user.game
-	game = re.sub(r'\W+','',game)
 	
-	while (True): #attempts to connect to db, if unsuccessful creates it then tries again
-		try:
-			conn = sqlite3.connect("gt2020.db") #connection to db
-			break
+	for uid, user in cp:
 
-		except: # if cant connect to db, make a new one
-			print ("No database file detected, creating new one.")
-			init_db(month) # initialises the db if one doesnt exist
+		print(uid)
+		game = user.game
+	
+		c = conn.cursor()
 
-
-	c = conn.cursor()
-
-	c.execute('create table if not exists '+month+' (ID text PRIMARY KEY);' )# creates table for new month
+		c.execute('create table if not exists '+month+' (ID text PRIMARY KEY);' )# creates table for new month
 
 
-	 # gets all the columns from the db
-	games = [game[0] for game in c.execute('select * from ' +month)] # list comprehension that puts all the column names into a list
+		# gets all the columns from the db
+		games = [game[0] for game in c.execute('select * from ' +month)] # list comprehension that puts all the column names into a list
 
-	# same as above but for users
-	users = [i[0] for i in list(c.execute('select ID from ' +month))]
+		# same as above but for users
+		users = [i[0] for i in list(c.execute('select ID from ' +month))]
 
-	if game not in games:
-		add_game(game, c) # adds new game if not already in db
+		if game not in games:
+			add_game(game, c) # adds new game if not already in db
 
-	if user.id not in users:
-		add_user(user.id, c, month) # adds new user if not already in db
+		if user.id not in users:
+			add_user(user.id, c, month) # adds new user if not already in db
 
-	playtime = round(user.end - user.start)#playtime to be added rounded to nearest int
-	update_gametime(user.id, c, playtime, game)#updates db with new gametime
+		update_gametime(user, c)#updates db with new gametime
 
-	conn.close()
+	print("database updated")
 
 
 
-def update_gametime(user_id,c, playtime, game):
-
+def update_gametime(user, c):
+	print("updating database...")
 	month = datetime.datetime.now.strftime("%B").upper()
-	
-	c.execute('update '+month+' set '+game+'='+game+'+'+str(playtime)+' where ID=?',(user_id,))
+	game = user.game
+	playtime = time.time() - user.start
+	c.execute('update '+month+' set '+game+'='+game+'+'+str(playtime)+' where ID=?',(user.id,))
 	c.commit()
 
 def add_game(game, c):	
-
+	print("adding new game to database")
 	month = datetime.datetime.strftime("%B").upper()
 
 	c.execute('alter table '+month+' add column '+game+' integer default 0')
@@ -72,14 +64,6 @@ def add_game(game, c):
 
 
 def add_user(user_id, c, month):
+	print("adding new user to database")
 	c.execute('insert into '+month+' (ID) values (?)', (user_id,))
 	c.commit()
-
-
-def init_db(month): # initialises the db 
-	f = open("gametime.db","w")
-	f.close()
-	conn = sqlite3.connect("gametime.db")
-	conn.execute("create table "+month+"(ID text PRIMARY KEY);")
-	conn.commit()
-	conn.close()
