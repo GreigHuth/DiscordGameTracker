@@ -1,8 +1,7 @@
 # bot to keep track of how many and how often games are played on discord
 # made by gurg
 import re
-import datetime
-import time 
+from datetime import datetime
 import sys
 import sqlite3
 import discord
@@ -13,6 +12,8 @@ from generate_output import generate_output
 from update_database import update_database
 from user import User
 
+#interval at which the update database script runs
+INTERVAL = 1
 
 #HELPER functions
 
@@ -59,7 +60,7 @@ class gametracker(discord.Client):
          #attempt to connect to db, throw exception if cannot
         try:
             print("Connecting to database...")
-            self.conn = sqlite3.connect("file:gt"+datetime.datetime.now().strftime("%Y")+".db?mode=rw", uri=True) #connection to db
+            self.conn = sqlite3.connect("file:gt"+datetime.now().strftime("%Y")+".db?mode=rw", uri=True) #connection to db
         except:
             sys.exit("No database file detected, make a file called gt<current year>.db")
 
@@ -71,11 +72,11 @@ class gametracker(discord.Client):
             for member in guild.members:
                 game = find_game(member.activities)
                 if game :
-                    user = User(member.id, game, time.time())
+                    user = User(member.id, game)
                     print("%s is playing %s" % (user.id, user.game))
                     await self.add_user(user)
 
-
+        print("scanning finished")
         print("The bot is ready!")
         await self.change_presence(activity=discord.Game(name="Selling your data..."))
 
@@ -88,10 +89,12 @@ class gametracker(discord.Client):
         if message.author.id == self.user.id:  # dont trigger on own messages, redundant? yeah but i cba testing
             return
 
+
+        #TODO: Commands need re-implemented
         #only do stuff if the message is actually a command
-        if message.content.split()[0] in self.COMMANDS :
-            output = generate_output(message)
-            await message.channel.send(output)
+        #if message.content.split()[0] in self.COMMANDS :
+        #    output = generate_output(message)
+        #    await message.channel.send(output)
 
 
 
@@ -103,65 +106,94 @@ class gametracker(discord.Client):
         if after.bot == True:  # if the user is a bot ignore it
             return
 
-
-        # check to see if user if user is in list of current players
-        #   if they are then check to see if they stopped playing a game and if they did then remove them from the list of people playing games 
-        #   else do nothing
-        #   
-        # else record the time and create a class for the user and then add the user to the list of current players 
-
         game = find_game(after.activities)
-        user = User(after.id, game, int(time.time()))
+        user = User(str(after.id), game)
         
-
+        print(game==None)
         #first check to see if they are playing a game now
-        if game:
-            if after.id not in self.currently_playing:
-                #if the are playing a game and werent before then start tracking them
+        if not (game == None):
+            if str(after.id) not in self.currently_playing:
+                print("%s started playing %s" % (user.id, user.game))
                 await self.add_user(user)
                 
 
         #if they arent playing a game then check if they were
-        else:
-            if after.id in self.currently_playing:
+        if game == None:
+            print(self.currently_playing)
+            print(after.id)
+            if str(after.id) in self.currently_playing:
+                print("%s stopped playing %s" % (user.id, user.game))
                 await self.remove_user(user)
                 
         
 
-    #function to run and update the database every second?
+    #function to run and update the database every 5 seconds
     async def update_times(self):
-
-        #for id, user in currently_playing:
-
-           #calculate how long they have been playing for 
-           # update the database with the new value 
-           #update_database(user, self.conn)
 
         await self.wait_until_ready()
         while not self.is_closed():
-            #update_database(self.currently_playing, self.conn)
-            await self.test()
-            await asyncio.sleep(5)
+            print("updating database")
 
-        return
+            #current month
+            month = datetime.now().strftime("%B").upper()
+
+            #if the database connection doesn't exist yet then ignore this task
+            if self.conn:
+
+                #iterate through list of current players and update the database accordingly
+                c = self.conn
+                for uid, user in self.currently_playing.items():
+                    print("Updating info for user %s"% uid)
+                    
+                    c.execute('create table if not exists '+month+' (ID text PRIMARY KEY);' )# creates table for new month
+
+                    # gets all the columns from the db
+                    cursor = c.execute('select * from ' +month)
+                    games = [game[0] for game in cursor.description] # list comprehension that puts all the column names into a list
+
+                    # same as above but for users
+                    cursor = c.execute('select ID from ' +month)
+                    users = [i[0] for i in list(cursor)]
+
+                    if user.game not in games:
+                        print("%s game not found adding to database" % user.game)
+                        self.add_game_db(user.game, c, month) # adds new game if not already in db
+
+                    if user.id not in users:
+                        print ("%s uid not found adding to database" % uid)
+                        self.add_user_db(user.id, c, month) # adds new user if not already in db
+
+                    self.update_gametime(user, c, month)#updates db with new gametime
+                
+
+                c.commit()
+                print("database updated")
+            
+            else:
+                print("no database connection, skipping.")
+            await asyncio.sleep(INTERVAL)
 
 
-    async def test(self):
-        print("test")
+    def update_gametime(self, user, c, month):
+        game = user.game
+        c.execute('update '+month+' set '+game+'='+game+'+'+str(INTERVAL)+' where ID=?',(user.id,))
+        c.commit()
 
-    #add user to list of tracker players
+    def add_game_db(self, game, c, month):	
+        c.execute('alter table '+month+' add column '+game+' integer default 0')
+        c.commit()
+
+    def add_user_db(self, user_id, c, month):
+        c.execute('insert into '+month+' (ID) values (?)', (user_id,))
+        c.commit()
+
+    #add user to list of tracked players
     async def add_user(self, user):
-        #NOTE: RACE CONDITION PROBABLY 
-       
-        print("%s started playing %s" % (user.id, user.game))
         self.currently_playing[user.id] = user
-
 
     #remove user from list of tracker players
     async def remove_user(self, user):
-        #if they were then remove them from the list so the database stops tracking them
-        print("%s stopped playing %s" % (user.id, user.game))
-        self.currently_playing.pop(user.id)
+        del self.currently_playing[user.id]
 
     
 

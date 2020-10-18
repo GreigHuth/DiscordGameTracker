@@ -18,10 +18,13 @@ def update_database(cp, conn):
 	month = now.strftime("%B").upper()
 	year = now.strftime("%Y")
 
+	if not conn:
+		print("no data base connection yet, skipping")
+		return
 	
 	for uid, user in cp:
 
-		print(uid)
+		print("updating info for user: %s" & uid)
 		game = user.game
 	
 		c = conn.cursor()
@@ -36,15 +39,16 @@ def update_database(cp, conn):
 		users = [i[0] for i in list(c.execute('select ID from ' +month))]
 
 		if game not in games:
+			print("%s not found adding to database" % game)
 			add_game(game, c) # adds new game if not already in db
 
 		if user.id not in users:
+			print ("%s not found adding to database" % uid)
 			add_user(user.id, c, month) # adds new user if not already in db
 
 		update_gametime(user, c)#updates db with new gametime
 
 	print("database updated")
-
 
 
 def update_gametime(user, c):
@@ -56,7 +60,6 @@ def update_gametime(user, c):
 	c.commit()
 
 def add_game(game, c):	
-	print("adding new game to database")
 	month = datetime.datetime.strftime("%B").upper()
 
 	c.execute('alter table '+month+' add column '+game+' integer default 0')
@@ -64,6 +67,5 @@ def add_game(game, c):
 
 
 def add_user(user_id, c, month):
-	print("adding new user to database")
 	c.execute('insert into '+month+' (ID) values (?)', (user_id,))
 	c.commit()
