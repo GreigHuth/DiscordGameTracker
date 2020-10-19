@@ -9,16 +9,15 @@ import logging
 import asyncio
 
 from generate_output import generate_output
-from update_database import update_database
 from user import User
 
-#interval at which the update database script runs
+#interval at which the update database script runs abd therefor how much the database should be updated with
 INTERVAL = 1
 
 #HELPER functions
 
-#given a tuple of activities the function will return the relevant Game object if the 
-#user is playing a game and return nothing otherwise
+#given a tuple of "activities" the function will return the relevant Game object if the 
+#   user is playing a game and return nothing otherwise
 #returns a string if the user is playing a game and None otherwise
 def find_game(activities):
 # if the activities is a tuple check all the elements to work out if one of them is a game
@@ -86,15 +85,15 @@ class gametracker(discord.Client):
 
     async def on_message(self, message):
 
-        if message.author.id == self.user.id:  # dont trigger on own messages, redundant? yeah but i cba testing
+        if message.author.id == self.user.id:  # dont trigger on own messages
             return
 
 
         #TODO: Commands need re-implemented
         #only do stuff if the message is actually a command
-        #if message.content.split()[0] in self.COMMANDS :
-        #    output = generate_output(message)
-        #    await message.channel.send(output)
+        if message.content.split()[0] in self.COMMANDS :
+            output = generate_output(message, self.conn)
+            await message.channel.send(output)
 
 
 
@@ -103,21 +102,21 @@ class gametracker(discord.Client):
     # after  -  the state of the user after the update 
     async def on_member_update(self, before, after):
 
-        if after.bot == True:  # if the user is a bot ignore it
+        if after.bot == True or before.bot == True:  # if the user is a bot ignore it
             return
 
         game = find_game(after.activities)
         user = User(str(after.id), game)
         
         print(game==None)
-        #first check to see if they are playing a game now
+        #first check to see if they are playing a game now, if they are now and they previously werent, add them to cp
         if not (game == None):
             if str(after.id) not in self.currently_playing:
                 print("%s started playing %s" % (user.id, user.game))
                 await self.add_user(user)
                 
 
-        #if they arent playing a game then check if they were
+        #if they arent playing a game then check if they were, if they were remove them from cp
         if game == None:
             print(self.currently_playing)
             print(after.id)
@@ -179,17 +178,21 @@ class gametracker(discord.Client):
         c.execute('update '+month+' set '+game+'='+game+'+'+str(INTERVAL)+' where ID=?',(user.id,))
         c.commit()
 
+
     def add_game_db(self, game, c, month):	
         c.execute('alter table '+month+' add column '+game+' integer default 0')
         c.commit()
+
 
     def add_user_db(self, user_id, c, month):
         c.execute('insert into '+month+' (ID) values (?)', (user_id,))
         c.commit()
 
+
     #add user to list of tracked players
     async def add_user(self, user):
         self.currently_playing[user.id] = user
+
 
     #remove user from list of tracker players
     async def remove_user(self, user):

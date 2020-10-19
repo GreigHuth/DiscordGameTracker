@@ -8,7 +8,7 @@ import datetime
 
 
 
-def generate_output(command):
+def generate_output(command, conn):
 
     #some commands have args so split message by space into array so its easier to deal with later  
     split_message = command.content.split()
@@ -24,16 +24,16 @@ def generate_output(command):
 
     #i should clean this up
     if split_message[0] ==  '!topgames':
-        output_message = topgames(month)
+        output_message = topgames(month, conn)
 
     if split_message[0] ==  '!topusers':
-        output_message = topusers(month, command.channel)
+        output_message = topusers(month, command.channel, conn)
 
     if split_message[0] ==  '!help':
         output_message = "there is no help"
 
     if split_message[0] ==  '!mygames':
-        output_message = mygames(command.author.id, month)
+        output_message = mygames(command.author.id, month, conn)
 
         
 

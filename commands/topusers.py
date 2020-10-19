@@ -3,7 +3,7 @@ from discord.utils import find
 import datetime
 from operator import itemgetter
 
-def topusers(month, channel):
+def topusers(month, channel, conn):
     # command that displays the top users of the given month in terms of game time
 
     
