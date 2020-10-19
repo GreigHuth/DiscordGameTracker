@@ -21,10 +21,15 @@ INTERVAL = 1
 #returns a string if the user is playing a game and None otherwise
 def find_game(activities):
 # if the activities is a tuple check all the elements to work out if one of them is a game
+
     if (isinstance(activities, tuple)):
         for i in range(len(activities)):
+            print("activity", activities[i])
+            print("activity type",type(activities[i]))
             if isinstance(activities[i], discord.Game):
                 return re.sub(r'\W+','',str(activities[i]))
+            if isinstance(activities[i], discord.Activity):
+                return re.sub(r'\W+','',str(activities[i].name))
 
         #if a game cant be found return false
         return None
