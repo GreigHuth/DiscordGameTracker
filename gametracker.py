@@ -82,7 +82,6 @@ class gametracker(discord.Client):
 
         print("scanning finished")
         print("The bot is ready!")
-        await self.change_presence(activity=discord.Game(name="Selling your data..."))
 
 
     # coroutine that runs whenever a message is sent to any channel in the server
