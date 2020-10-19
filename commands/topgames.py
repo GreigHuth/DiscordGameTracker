@@ -4,13 +4,11 @@ import datetime
 from operator import itemgetter
 
 
-def topgames(month): 
+def topgames(month, conn): 
     #invoked when topgames command is typed into discord
     #queries the sqlite data base "gametime.db" and gets the total of the time each game has been played 
     #   in that month across all users
 
-
-    conn = sqlite3.connect("gametime.db")
 
     cursor = conn.execute('select * from ' + month) 
     games = [game[0] for game in cursor.description] # list comprehension that puts all the column names into a list

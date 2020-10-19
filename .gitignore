@@ -4,3 +4,4 @@ __pycache__/
 gametime.db
 config.py
 .vscode
+testing.py

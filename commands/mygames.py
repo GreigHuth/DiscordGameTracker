@@ -5,9 +5,8 @@ from operator import itemgetter
 
 
 #command that lets people see thier own personal gametimes
-def mygames(user_id, month):
+def mygames(user_id, month, conn):
 
-    conn = sqlite3.connect("gametime.db")
 
     cursor = conn.execute('select * from ' +month+ ' where ID = ' +user_id) #gets all the times for the user who issued the command
     times = list(cursor.fetchall()[0]) # puts the times in a list and makes them integers
