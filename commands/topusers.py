@@ -7,8 +7,6 @@ def topusers(month, channel, conn):
     # command that displays the top users of the given month in terms of game time
 
     
-    conn = sqlite3.connect("gametime.db")
-    
     cursor = conn.execute('select ID from '+month) # get all user ids
     users = [user[0] for user in cursor.fetchall()]
 
@@ -34,9 +32,18 @@ def topusers(month, channel, conn):
     
     #begin constructing message
     message = "Top %s gamerz in %s:\n```" % ("10", month.lower())
-    for user in user_totals:
-        member = find(lambda m: m.id == user[0], channel.server.members) # get user 
-        message += '%s - {0:.2f} hours\n\n'.format(user[1]) % member.display_name
+    for user_id, total in user_totals:
+
+        name = get_name(user_id, channel.guild)
+        message += '%s - {0:.2f} hours\n\n'.format(total) % name
+
     message += '```'
 
     return message
+
+
+def get_name(id, guild):
+
+    for member in guild.members:
+        if str(id) == str(member.id):
+            return member.name

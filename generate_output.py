@@ -33,7 +33,7 @@ def generate_output(command, conn):
         output_message = "there is no help"
 
     if split_message[0] ==  '!mygames':
-        output_message = mygames(command.author.id, month, conn)
+        output_message = mygames(str(command.author.id), month, conn)
 
         
 

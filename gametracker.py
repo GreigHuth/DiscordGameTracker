@@ -24,7 +24,7 @@ def find_game(activities):
 
     if (isinstance(activities, tuple)):
         for i in range(len(activities)):
-            print("activity", activities[i])
+            #Sprint("activity", activities[i])
             if isinstance(activities[i], discord.Game):
                 return re.sub(r'\W+','',str(activities[i]))
             if isinstance(activities[i], discord.Activity):
@@ -119,12 +119,12 @@ class gametracker(discord.Client):
             
             #if the user is playing a different game than before then remove it and re-add it
             if (after.id in self.currently_playing) and self.currently_playing[after.id].game != find_game(after.activities):
-                print("User switched games")
+                print("%s switched games" % user.id)
                 await self.remove_user(user)
                 await self.add_user(user)
 
             if find_game(before.activities) == find_game(after.activities):
-                print("user is still playing game, ignore")
+                print("%s is still playing game, ignore" % user.id)
                 pass
             
             else:
