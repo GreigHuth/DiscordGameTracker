@@ -113,7 +113,6 @@ class gametracker(discord.Client):
         game = find_game(after.activities)
         user = User(str(after.id), game)
 
-        
 
         #first check to see if they are playing a game now, if they are now and they previously werent, add them to cp
         if not (game == None):
