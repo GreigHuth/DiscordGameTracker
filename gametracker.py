@@ -142,8 +142,6 @@ class gametracker(discord.Client):
 
         #if they arent playing a game then check if they were, if they were remove them from cp
         if game == None:
-            print(self.currently_playing)
-            print(after.id)
             if str(after.id) in self.currently_playing:
                 print("%s stopped playing %s" % (user.id, user.game))
                 await self.remove_user(user)
