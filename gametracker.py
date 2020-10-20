@@ -25,7 +25,6 @@ def find_game(activities):
     if (isinstance(activities, tuple)):
         for i in range(len(activities)):
             print("activity", activities[i])
-            print("activity type",type(activities[i]))
             if isinstance(activities[i], discord.Game):
                 return re.sub(r'\W+','',str(activities[i]))
             if isinstance(activities[i], discord.Activity):
@@ -46,6 +45,8 @@ class gametracker(discord.Client):
 
 
     COMMANDS = ["!topgames", "!topusers", "!help", "!mygames"]
+
+    # dict <users id, class representing user>
     currently_playing = {}
     conn = None
 
@@ -107,17 +108,32 @@ class gametracker(discord.Client):
     async def on_member_update(self, before, after):
 
         if after.bot == True or before.bot == True:  # if the user is a bot ignore it
-            return
+            pass
 
         game = find_game(after.activities)
         user = User(str(after.id), game)
+
         
-        print(game==None)
+
         #first check to see if they are playing a game now, if they are now and they previously werent, add them to cp
         if not (game == None):
-            if str(after.id) not in self.currently_playing:
+            
+            #if the user is playing a different game than before then remove it and re-add it
+            if (after.id in self.currently_playing) and self.currently_playing[after.id].game != find_game(after.activities):
+                print("User switched games")
+                await self.remove_user(user)
+                await self.add_user(user)
+
+            if find_game(before.activities) == find_game(after.activities):
+                print("user is still playing game, ignore")
+                pass
+            
+            else:
                 print("%s started playing %s" % (user.id, user.game))
                 await self.add_user(user)
+        
+            
+
                 
 
         #if they arent playing a game then check if they were, if they were remove them from cp
@@ -135,7 +151,7 @@ class gametracker(discord.Client):
 
         await self.wait_until_ready()
         while not self.is_closed():
-            print("updating database")
+            #print("updating database")
 
             #current month
             month = datetime.now().strftime("%B").upper()
@@ -146,7 +162,7 @@ class gametracker(discord.Client):
                 #iterate through list of current players and update the database accordingly
                 c = self.conn
                 for uid, user in self.currently_playing.items():
-                    print("Updating info for user %s"% uid)
+                    #print("Updating info for user %s"% uid)
                     
                     c.execute('create table if not exists '+month+' (ID text PRIMARY KEY);' )# creates table for new month
 
@@ -170,7 +186,7 @@ class gametracker(discord.Client):
                 
 
                 c.commit()
-                print("database updated")
+                #print("database updated")
             
             else:
                 print("no database connection, skipping.")
