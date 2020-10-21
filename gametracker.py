@@ -77,11 +77,15 @@ class gametracker(discord.Client):
         print("Scanning server for gamers...")
         for guild in self.guilds:
             for member in guild.members:
-                game = find_game(member.activities)
-                print (game)
-                if game :
-                    user = User(member.id, game)
-                    await self.add_user(user)
+                if member.bot == True:
+                    print("%s: is a bot" % member.name)
+                
+                else:
+                    game = find_game(member.activities)
+                    if game :
+                        user = User(member.id, game)
+                        print("%s is playing %s" % (user.id, user.game))
+                        await self.add_user(user)
 
         print("scanning finished")
         print("The bot is ready!")
@@ -110,6 +114,7 @@ class gametracker(discord.Client):
     async def on_member_update(self, before, after):
 
         if after.bot == True or before.bot == True:  # if the user is a bot ignore it
+            print(after.bot == True)
             pass
 
         game = find_game(after.activities)
@@ -140,8 +145,6 @@ class gametracker(discord.Client):
 
         #if they arent playing a game then check if they were, if they were remove them from cp
         if game == None:
-            print(self.currently_playing)
-            print(after.id)
             if str(after.id) in self.currently_playing:
                 print("%s stopped playing %s" % (user.id, user.game))
                 await self.remove_user(user)
