@@ -2,6 +2,7 @@
 # made by gurg
 import re
 from datetime import datetime
+import time 
 import sys
 import sqlite3
 import discord
@@ -49,6 +50,7 @@ class gametracker(discord.Client):
     # dict <users id, class representing user>
     currently_playing = {}
     conn = None
+    prev_time = 0
 
 
     def __init__(self, *args, **kwargs):
@@ -76,9 +78,9 @@ class gametracker(discord.Client):
         for guild in self.guilds:
             for member in guild.members:
                 game = find_game(member.activities)
+                print (game)
                 if game :
                     user = User(member.id, game)
-                    print("%s is playing %s" % (user.id, user.game))
                     await self.add_user(user)
 
         print("scanning finished")
@@ -119,16 +121,17 @@ class gametracker(discord.Client):
             
             #if the user is playing a different game than before then remove it and re-add it
             if (after.id in self.currently_playing) and self.currently_playing[after.id].game != find_game(after.activities):
-                print("%s switched games" % user.id)
                 await self.remove_user(user)
+
+                self.last_update = time.time()
                 await self.add_user(user)
 
             if find_game(before.activities) == find_game(after.activities):
-                print("%s is still playing game, ignore" % user.id)
                 pass
             
             else:
                 print("%s started playing %s" % (user.id, user.game))
+                user.last_update = time.time()
                 await self.add_user(user)
         
             
@@ -181,7 +184,7 @@ class gametracker(discord.Client):
                         print ("%s uid not found adding to database" % uid)
                         self.add_user_db(user.id, c, month) # adds new user if not already in db
 
-                    self.update_gametime(user, c, month)#updates db with new gametime
+                    user.last_update = self.update_gametime(user, c, month)#updates db with new gametime
                 
 
                 c.commit()
@@ -194,8 +197,16 @@ class gametracker(discord.Client):
 
     def update_gametime(self, user, c, month):
         game = user.game
-        c.execute('update '+month+' set '+game+'='+game+'+'+str(INTERVAL)+' where ID=?',(user.id,))
+
+        now = time.time()
+        interval = now - user.last_update 
+        print ("%f seconds since last update for user: %s" % (interval, user.id))
+        
+        #actually update the sql database
+        c.execute('update '+month+' set '+game+'='+game+'+'+str(interval)+' where ID=?',(user.id,))
         c.commit()
+
+        return now
 
 
     def add_game_db(self, game, c, month):	
@@ -208,7 +219,7 @@ class gametracker(discord.Client):
         c.commit()
 
 
-    #add user to list of tracked players
+    #add user to list of tracked players, als returns the time they were added
     async def add_user(self, user):
         self.currently_playing[user.id] = user
 
