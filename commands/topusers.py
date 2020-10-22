@@ -1,6 +1,8 @@
 import sqlite3
+import discord
 from discord.utils import find
 import datetime
+from config.config import EMBED_COLOUR, EMBED_URL
 from operator import itemgetter
 
 def topusers(month, channel, conn):
@@ -30,20 +32,27 @@ def topusers(month, channel, conn):
     user_totals = sorted(user_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
     user_totals = user_totals[:10] # only displays top ten
     
+    
+    title = "Top %s gamers in %s:\n" % ("10", month.lower())
+ 
+
     #begin constructing message
-    message = "Top %s gamerz in %s:\n```" % ("10", month.lower())
+    i = 1
+    content = ""
     for user_id, total in user_totals:
-
         name = get_name(user_id, channel.guild)
-        message += '%s - {0:.2f} hours\n\n'.format(total) % name
 
-    message += '```'
+        if name == None:
+            return discord.Embed(title=title, type="rich", description=content, colour=EMBED_COLOUR)
+        content += '%d: %s - {0:.2f} hours\n\n'.format(total) % (i, str(name))
+        i += 1
+    
+    message = discord.Embed(title=title, type="rich", description=content, colour=EMBED_COLOUR)
 
     return message
 
 
 def get_name(id, guild):
-
     for member in guild.members:
         if str(id) == str(member.id):
             return member.name

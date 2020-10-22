@@ -102,12 +102,10 @@ class gametracker(discord.Client):
 
         #TODO: Commands need re-implemented
         #only do stuff if the message is actually a command
-        try:
-            if message.content.split()[0] in self.COMMANDS :
-                output = generate_output(message, self.conn)
-                await message.channel.send(output)
-        except IndexError:
-            print("shrug")
+        if message.content.split()[0] in self.COMMANDS :
+            output = generate_output(message, self.conn)
+            await message.channel.send(embed=output)
+
 
 
     # coroutine that runs whenever a member updates thier activity status game or customs status
@@ -148,7 +146,7 @@ class gametracker(discord.Client):
         #if they arent playing a game then check if they were, if they were remove them from cp
         if game == None:
             if str(after.id) in self.currently_playing:
-                print("%s stopped playing %s" % (user.id, find_game(after.activities)))
+                print("%s stopped playing %s" % (user.id, user.game))
                 await self.remove_user(user)
                 
         
@@ -205,7 +203,7 @@ class gametracker(discord.Client):
 
         now = time.time()
         interval = now - user.last_update 
-        #print ("%f seconds since last update for user: %s" % (interval, user.id))
+        print ("%f seconds since last update for user: %s" % (interval, user.id))
         
         #actually update the sql database
         c.execute('update '+month+' set '+game+'='+game+'+'+str(interval)+' where ID=?',(user.id,))
