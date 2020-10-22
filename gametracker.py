@@ -146,7 +146,7 @@ class gametracker(discord.Client):
         #if they arent playing a game then check if they were, if they were remove them from cp
         if game == None:
             if str(after.id) in self.currently_playing:
-                print("%s stopped playing %s" % (user.id, user.game))
+                print("%s stopped playing %s" % (user.id, find_game(before.activities)))
                 await self.remove_user(user)
                 
         
@@ -203,7 +203,7 @@ class gametracker(discord.Client):
 
         now = time.time()
         interval = now - user.last_update 
-        print ("%f seconds since last update for user: %s" % (interval, user.id))
+        
         
         #actually update the sql database
         c.execute('update '+month+' set '+game+'='+game+'+'+str(interval)+' where ID=?',(user.id,))
