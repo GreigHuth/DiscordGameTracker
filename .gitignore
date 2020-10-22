@@ -5,4 +5,5 @@ gametime.db
 config.py
 .vscode
 testing.py
-gt*
+gt.log
+gt2020.db
