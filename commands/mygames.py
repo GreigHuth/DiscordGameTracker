@@ -30,9 +30,9 @@ def mygames(user_id, month, conn):
     title = "Top 10 games youve played in %s:\n" %(month.lower()) 
     i = 1
     content = ""
-    for game in game_totals:
-        for game, time  in game_totals:
-            content += "%d: %s - {0:.2f}hours \n\n".format(time) % (i,game)
+    for game, time  in game_totals:
+        content += "%d: %s - {0:.2f}hours \n\n".format(time) % (i,game)
+        i += 1
     
     message = discord.Embed(title=title, type="rich", description=content, colour=EMBED_COLOUR)
     
