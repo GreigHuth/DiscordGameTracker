@@ -9,7 +9,11 @@ def mygames(user_id, month, conn):
 
 
     cursor = conn.execute('select * from ' +month+ ' where ID = ' +user_id) #gets all the times for the user who issued the command
-    times = list(cursor.fetchall()[0]) # puts the times in a list and makes them integers
+    try:
+        times = list(cursor.fetchall()[0]) # puts the times in a list and makes them integers
+    except IndexError:
+        return "you havent played any games yet, stop being productive"
+
     times.pop(0) # removes ID
     times =  map(lambda x: x/3600, times) # converts all the times from seconds to hours 
     
