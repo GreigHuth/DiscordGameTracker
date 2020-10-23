@@ -173,13 +173,14 @@ class gametracker(discord.Client):
 
                     # gets all the columns from the db
                     cursor = c.execute('select * from ' +month)
-                    games = [game[0] for game in cursor.description] # list comprehension that puts all the column names into a list
-
+                    games = [game[0].lower() for game in cursor.description] # list comprehension that puts all the column names into a list
+                    
                     # same as above but for users
                     cursor = c.execute('select ID from ' +month)
                     users = [i[0] for i in list(cursor)]
 
-                    if user.game not in games:
+                    if user.game.lower() not in games:
+                        print(user.game)
                         print("%s game not found adding to database" % user.game)
                         self.add_game_db(user.game, c, month) # adds new game if not already in db
 
