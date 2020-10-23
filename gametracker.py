@@ -102,10 +102,13 @@ class gametracker(discord.Client):
 
         #TODO: Commands need re-implemented
         #only do stuff if the message is actually a command
-        if message.content.split()[0] in self.COMMANDS :
-            output = generate_output(message, self.conn)
-            await message.channel.send(embed=output)
-
+        
+        try:
+            if message.content.split()[0] in self.COMMANDS :
+                output = generate_output(message, self.conn)
+                await message.channel.send(embed=output)
+        except IndexError:
+             return
 
 
     # coroutine that runs whenever a member updates thier activity status game or customs status
