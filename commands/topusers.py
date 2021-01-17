@@ -31,6 +31,8 @@ def topusers(month, channel, conn):
     user_totals = [i for i in user_totals if i[0] != "Spotify" ] # remove spotify
     user_totals = sorted(user_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
     user_totals = user_totals[:10] # only displays top ten
+
+    print(user_totals)
     
     
     title = "Top %s gamers in %s:\n" % ("10", month.lower())

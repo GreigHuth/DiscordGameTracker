@@ -13,7 +13,7 @@ from generate_output import generate_output
 from user import User
 
 #interval at which the update database script runs abd therefor how much the database should be updated with
-INTERVAL = 1
+INTERVAL = 5
 
 #HELPER functions
 
@@ -25,7 +25,6 @@ def find_game(activities):
 
     if (isinstance(activities, tuple)):
         for i in range(len(activities)):
-            #Sprint("activity", activities[i])
             if isinstance(activities[i], discord.Game):
                 return re.sub(r'\W+','',str(activities[i]))
             if isinstance(activities[i], discord.Activity):
@@ -33,6 +32,8 @@ def find_game(activities):
 
         #if a game cant be found return false
         return None
+
+
 
     # if its not a tuple still check it
     elif isinstance(activities, discord.Game):
@@ -76,15 +77,15 @@ class gametracker(discord.Client):
         #scrape all the users to see if they are already playing games, if they are, start tracking them
         print("Scanning server for gamers...")
         for guild in self.guilds:
+            print(guild.members)
             for member in guild.members:
                 if member.bot == True:
                     print("%s: is a bot" % member.name)
-                
                 else:
                     game = find_game(member.activities)
                     if game :
                         user = User(member.id, game)
-                        print("%s is playing %s" % (user.id, user.game))
+                        #print("%s is playing %s" % (user.id, user.game))
                         await self.add_user(user)
 
         print("scanning finished")
@@ -117,13 +118,13 @@ class gametracker(discord.Client):
     async def on_member_update(self, before, after):
 
         if after.bot == True or before.bot == True:  # if the user is a bot ignore it
-            print(after.bot == True)
+            #print(after.bot == True)
             pass
 
         game = find_game(after.activities)
         user = User(str(after.id), game)
 
-
+#        print("user started playing game")
         #first check to see if they are playing a game now, if they are now and they previously werent, add them to cp
         if not (game == None):
             
@@ -149,7 +150,7 @@ class gametracker(discord.Client):
         #if they arent playing a game then check if they were, if they were remove them from cp
         if game == None:
             if str(after.id) in self.currently_playing:
-                print("%s stopped playing %s" % (user.id, find_game(before.activities)))
+                #print("%s stopped playing %s" % (user.id, find_game(before.activities)))
                 await self.remove_user(user)
                 
         
@@ -183,12 +184,12 @@ class gametracker(discord.Client):
                     users = [i[0] for i in list(cursor)]
 
                     if user.game.lower() not in games:
-                        print(user.game)
-                        print("%s game not found adding to database" % user.game)
+                        #print(user.game)
+                       # print("%s game not found adding to database" % user.game)
                         self.add_game_db(user.game, c, month) # adds new game if not already in db
 
                     if user.id not in users:
-                        print ("%s uid not found adding to database" % uid)
+                       # print ("%s uid not found adding to database" % uid)
                         self.add_user_db(user.id, c, month) # adds new user if not already in db
 
                     user.last_update = self.update_gametime(user, c, month)#updates db with new gametime
@@ -210,14 +211,20 @@ class gametracker(discord.Client):
         
         
         #actually update the sql database
-        c.execute('update '+month+' set '+game+'='+game+'+'+str(interval)+' where ID=?',(user.id,))
+        try:
+            c.execute('update '+month+' set '+game+'='+game+'+'+str(interval)+' where ID=?',(user.id,))
+        except sqlite3.OperationalError:
+            return now
         c.commit()
 
         return now
 
 
     def add_game_db(self, game, c, month):	
-        c.execute('alter table '+month+' add column '+game+' integer default 0')
+        try:
+            c.execute('alter table '+month+' add column '+game+' integer default 0')
+        except sqlite3.OperationalError:
+            return
         c.commit()
 
 
