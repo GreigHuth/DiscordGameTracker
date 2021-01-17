@@ -5,17 +5,17 @@ have been played for on a month by month basis.
 
 EXAMPLE:
 ```
-discord_user: !topgames 5 march
+discord_user: !topgames 
 
-GameTracker:  Top 5 games played in march (in hours):
+GameTracker:  Top 10 games played in <current_month> (in hours):
 
               ApexLegends - 18.77 hours played
               
               LeagueofLegends - 15.43 hours played
               
-              Spotify - 8.56 hours played
+              Fortnite - 8.56 hours played
               
-              RuneLite - 8.09 hours played
+              Minecraft - 8.09 hours played
               
               Overwatch - 6.46 hours played
              
@@ -28,8 +28,9 @@ GameTracker was built to achieve two things:
 2. To allow users to make decisions on what to play based on what the other people in the server are playing.
 
 ## Current Commands:  
-`!topgames [limit] [month]` - displays the games with the highest playtime in a given month.    
-`!topusers [limit] [month]` - displays the users that have the highest playtime in a given month.    
+`!topgames` - displays the games with the highest playtime in the current month.    
+`!topusers` - displays the users that have the highest playtime in the current month.  
+`!mygames`  -  displays your playtime for this month.  
 `!help` -  output is above
 
 ## Prerequisites
