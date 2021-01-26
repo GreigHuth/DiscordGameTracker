@@ -24,7 +24,7 @@ GameTracker:  Top 10 games played in <current_month> (in hours):
 ## Why would i want this?
 
 GameTracker was built to achieve two things:  
-1. To allow server owners of large communities to (somewhat) definitively answer "What does your community play?".  
+1. To allow server owners of large communities to (somewhat) answer "What does your community play?".  
 2. To allow users to make decisions on what to play based on what the other people in the server are playing.
 
 ## Current Commands:  
@@ -43,7 +43,7 @@ GameTracker was built to achieve two things:
 
 **Set up virtualenv**
 
-`virtualenv -p $(which python3.6) .venv`
+`virtualenv -p $(which python3) .venv`
 
 `source .venv/bin/activate`
 
@@ -63,8 +63,7 @@ GameTracker was built to achieve two things:
 
 ## Possible new features
 
-Add the functionality to allow users to PM the bot and get thier own personal playtime data.  
-Better formatting for the output.
+Game suggestions???
 
 ### Get in touch
-If you'd like to add GameTracker to your server or have any critisisms/ideas please PM Gurgashaska#6315 on discord.
+If you'd like to add GameTracker to your server or have any critisisms/ideas please PM Gurg#6315 on discord or email me at gurg@edingamesoc.co.uk
