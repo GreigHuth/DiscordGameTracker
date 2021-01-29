@@ -61,6 +61,11 @@ GameTracker was built to achieve two things:
 
 `python gametracker.py`
 
+## Known Issues
+1. The bot is not 100% accurate not quite worked out the root cause but its inconsitent to say the least
+2. Bot doesnt work with the most recent version of the discord.py library, for now please make sure your using version 1.4.2
+3. !topusers seems to be a bit bugged but again, im not sure why, it used to work fine
+
 ## Possible new features
 
 Game suggestions???
