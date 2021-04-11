@@ -21,15 +21,6 @@ INTERVAL = 5
 
 #HELPER functions
 
-def filter_optout(member):
-    if member.id in optout:
-            return True
-        #filter out optout
-    for role in after.roles:
-        if member.id == 830917949178904586:
-            optout.add(before.id)#add user to list of optouts 
-            return True
-
 
 
 #if finds a game activity if it exists
@@ -64,7 +55,7 @@ class gametracker(discord.Client):
     currently_playing = {}
     conn = None
     prev_time = 0
-    optout = {}
+    optout = set()
 
 
     def __init__(self, *args, **kwargs):
@@ -73,6 +64,14 @@ class gametracker(discord.Client):
         #create the task and run it in the background
         self.bg_task = self.loop.create_task(self.update_times())
 
+    def filter_optout(self, member):
+        if member.id in self.optout:
+                return True
+            #filter out optout
+        for role in member.roles:
+            if role.id == 830917949178904586:
+                self.optout.add(member.id)#add user to list of optouts 
+                return True
 
     async def on_ready(self):
 
@@ -90,7 +89,7 @@ class gametracker(discord.Client):
         for guild in self.guilds:
             print(guild.members)
             for member in guild.members:
-                if filter_optout(message.author):
+                if self.filter_optout(member):
                     continue
                 if member.bot == True:
                     continue
@@ -110,7 +109,7 @@ class gametracker(discord.Client):
 
     async def on_message(self, message):
 
-        if filter_optout(message.author):
+        if self.filter_optout(message.author):
             pass
 
         #BREAKOUT ROOMS, ill move this somewhere else eventually
@@ -177,7 +176,7 @@ class gametracker(discord.Client):
     async def on_member_update(self, before, after):
 
         #ignore user if they have the optout role
-        if filter_optout(message.author):
+        if self.filter_optout(before.author):
             pass
 
 
