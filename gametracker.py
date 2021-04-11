@@ -21,9 +21,18 @@ INTERVAL = 5
 
 #HELPER functions
 
-#given a tuple of "activities" the function will return the relevant Game object if the 
-#   user is playing a game and return nothing otherwise
-#returns a string if the user is playing a game and None otherwise
+def filter_optout(member):
+    if member.id in optout:
+            return True
+        #filter out optout
+        for role in after.roles:
+            if member.id == 830917949178904586
+                optout.add(before.id)#add user to list of optouts 
+                return True
+
+
+
+#if finds a game activity if it exists
 def find_game(activities):
 # if the activities is a tuple check all the elements to work out if one of them is a game
 
@@ -55,6 +64,7 @@ class gametracker(discord.Client):
     currently_playing = {}
     conn = None
     prev_time = 0
+    optout = {}
 
 
     def __init__(self, *args, **kwargs):
@@ -80,6 +90,8 @@ class gametracker(discord.Client):
         for guild in self.guilds:
             print(guild.members)
             for member in guild.members:
+                if filter_optout(message.author):
+                    continue
                 if member.bot == True:
                     continue
                 else:
@@ -98,6 +110,8 @@ class gametracker(discord.Client):
 
     async def on_message(self, message):
 
+        if filter_optout(message.author):
+            pass
 
         #BREAKOUT ROOMS, ill move this somewhere else eventually
         if message.content.startswith('!breakout'):
@@ -161,6 +175,11 @@ class gametracker(discord.Client):
     # before -  the state of the user before the update
     # after  -  the state of the user after the update 
     async def on_member_update(self, before, after):
+
+        #ignore user if they have the optout role
+        if filter_optout(message.author):
+            pass
+
 
         if after.bot == True or before.bot == True:  # if the user is a bot ignore it
             pass
