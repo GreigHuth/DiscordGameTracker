@@ -37,6 +37,10 @@ def topgames(month, conn):
    for game in game_totals:
       content += '%d: %s - {0:.2f} hours\n\n'.format(game[1]) % (i, game[0])
       i += 1
+
+      if i > 10:
+         break
+
     
    message = discord.Embed(title=title, type="rich", description=content, colour=EMBED_COLOUR)
 

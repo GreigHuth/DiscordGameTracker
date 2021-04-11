@@ -7,7 +7,6 @@ from operator import itemgetter
 
 def topusers(month, channel, conn):
     # command that displays the top users of the given month in terms of game time
-
     
     cursor = conn.execute('select ID from '+month) # get all user ids
     users = [user[0] for user in cursor.fetchall()]
@@ -48,6 +47,9 @@ def topusers(month, channel, conn):
             return discord.Embed(title=title, type="rich", description=content, colour=EMBED_COLOUR)
         content += '%d: %s - {0:.2f} hours\n\n'.format(total) % (i, str(name))
         i += 1
+
+        if i > 10:
+            break
     
     message = discord.Embed(title=title, type="rich", description=content, colour=EMBED_COLOUR)
 

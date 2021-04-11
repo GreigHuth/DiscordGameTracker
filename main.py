@@ -4,7 +4,9 @@ import sys
 from gametracker import gametracker
 from config.config import TOKEN
 
+intents = discord.Intents(presences=True,messages=True,members=True, guilds=True)
 
+#logging shite
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='gt.log', encoding='utf-8', mode='w')
@@ -18,9 +20,10 @@ logger.addHandler(handler)
 
 
 # TODO
-# get a better name[x]
-# get a profile pic[]
-# MAKE THE COMMANDS MORE OBJECT ORIENTED
+# update bot to use intents
+# add breakout bot to this
+# optimise the commands
+# restructure database
 
 
 if TOKEN == "":
@@ -28,5 +31,5 @@ if TOKEN == "":
     sys.exit(0)
 
 
-client = gametracker()
+client = gametracker(intents=intents)
 client.run(TOKEN)

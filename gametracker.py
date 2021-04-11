@@ -8,6 +8,10 @@ import sqlite3
 import discord
 import logging 
 import asyncio
+import random
+
+from config.config import GODS
+from config.config import CATEGORY
 
 from generate_output import generate_output
 from user import User
@@ -45,7 +49,6 @@ def find_game(activities):
 
 class gametracker(discord.Client):
 
-
     COMMANDS = ["!topgames", "!topusers", "!help", "!mygames"]
 
     # dict <users id, class representing user>
@@ -56,8 +59,6 @@ class gametracker(discord.Client):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-       
 
         #create the task and run it in the background
         self.bg_task = self.loop.create_task(self.update_times())
@@ -80,7 +81,7 @@ class gametracker(discord.Client):
             print(guild.members)
             for member in guild.members:
                 if member.bot == True:
-                    print("%s: is a bot" % member.name)
+                    continue
                 else:
                     game = find_game(member.activities)
                     if game :
@@ -97,7 +98,51 @@ class gametracker(discord.Client):
 
     async def on_message(self, message):
 
+
+        #BREAKOUT ROOMS, ill move this somewhere else eventually
+        if message.content.startswith('!breakout'):
+            if message.author.id not in GODS:
+                await message.channel.send("fuck you")
+
+            args = message.content.split()
+        
+            #default number of groups is 3
+            try: 
+                groups = int(args[1])
+            except IndexError: 
+                groups = 3
+
+            try:
+                #get all members in same vc as me
+                victims = message.author.voice.channel.members
+            except AttributeError: #if in not in a VC dont do anything
+                return
+
+            #shuffle victims to make sure its more random
+            random.shuffle(victims)
+
+            #list of all voice channels
+            channels = message.guild.voice_channels
+
+            #remove channels that arent in the specified category
+            channels = [x for x in channels if x.category_id == CATEGORY]
+
+            #random indexes corresponding to all_channels
+            rooms = random.sample(range(0, len(channels) ), groups)
+
+            i = 0
+            for v in victims:
+                index = i % groups
+                print ("moving %s to %s" % (v, index))
+                await v.edit(voice_channel=channels[rooms[index]])    
+                i = i+1
+
+
+
         if message.author.id == self.user.id:  # dont trigger on own messages
+            return
+
+        if message.author.bot == True:
             return
 
 
@@ -118,7 +163,6 @@ class gametracker(discord.Client):
     async def on_member_update(self, before, after):
 
         if after.bot == True or before.bot == True:  # if the user is a bot ignore it
-            #print(after.bot == True)
             pass
 
         game = find_game(after.activities)
