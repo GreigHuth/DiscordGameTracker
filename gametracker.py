@@ -55,7 +55,6 @@ class gametracker(discord.Client):
     currently_playing = {}
     conn = None
     prev_time = 0
-    optout = set()
 
 
     def __init__(self, *args, **kwargs):
@@ -65,12 +64,9 @@ class gametracker(discord.Client):
         self.bg_task = self.loop.create_task(self.update_times())
 
     def filter_optout(self, member):
-        if member.id in self.optout:
-                return True
             #filter out optout
         for role in member.roles:
-            if role.id == 830917949178904586:
-                self.optout.add(member.id)#add user to list of optouts 
+            if role.id == 767818293943599155:
                 return True
 
     async def on_ready(self):
@@ -87,7 +83,6 @@ class gametracker(discord.Client):
         #scrape all the users to see if they are already playing games, if they are, start tracking them
         print("Scanning server for gamers...")
         for guild in self.guilds:
-            print(guild.members)
             for member in guild.members:
                 if self.filter_optout(member):
                     continue
@@ -176,12 +171,9 @@ class gametracker(discord.Client):
     async def on_member_update(self, before, after):
 
         #ignore user if they have the optout role
-        if self.filter_optout(before.author):
-            pass
-
-
-        if after.bot == True or before.bot == True:  # if the user is a bot ignore it
-            pass
+        if self.filter_optout(after) == True:
+            print("ignoring user {}".format(before.id))
+            return
 
         game = find_game(after.activities)
         user = User(str(after.id), game)
@@ -198,7 +190,7 @@ class gametracker(discord.Client):
                 await self.add_user(user)
 
             if find_game(before.activities) == find_game(after.activities):
-                pass
+                return
             
             else:
                 print("%s started playing %s" % (user.id, user.game))
