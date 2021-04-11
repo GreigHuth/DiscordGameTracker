@@ -26,7 +26,7 @@ def filter_optout(member):
             return True
         #filter out optout
     for role in after.roles:
-        if member.id == 830917949178904586
+        if member.id == 830917949178904586:
             optout.add(before.id)#add user to list of optouts 
             return True
 
