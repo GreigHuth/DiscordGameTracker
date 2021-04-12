@@ -12,6 +12,7 @@ import random
 
 from config.config import GODS
 from config.config import CATEGORY
+from config.config import OPTOUT
 
 from generate_output import generate_output
 from user import User
@@ -66,7 +67,7 @@ class gametracker(discord.Client):
     def filter_optout(self, member):
             #filter out optout
         for role in member.roles:
-            if role.id == 767818293943599155:
+            if role.id == OPTOUT:
                 return True
 
     async def on_ready(self):
@@ -85,6 +86,7 @@ class gametracker(discord.Client):
         for guild in self.guilds:
             for member in guild.members:
                 if self.filter_optout(member):
+                    print("ignoring user {}".format(member.id))
                     continue
                 if member.bot == True:
                     continue
@@ -105,7 +107,8 @@ class gametracker(discord.Client):
     async def on_message(self, message):
 
         if self.filter_optout(message.author):
-            pass
+            print("ignoring user {}".format(message.author.id))
+            return
 
         #BREAKOUT ROOMS, ill move this somewhere else eventually
         if message.content.startswith('!breakout'):
@@ -153,9 +156,6 @@ class gametracker(discord.Client):
         if message.author.bot == True:
             return
 
-
-        #TODO: Commands need re-implemented
-        #only do stuff if the message is actually a command
         
         try:
             if message.content.split()[0] in self.COMMANDS :
@@ -172,7 +172,7 @@ class gametracker(discord.Client):
 
         #ignore user if they have the optout role
         if self.filter_optout(after) == True:
-            print("ignoring user {}".format(before.id))
+            print("ignoring user {}".format(after.id))
             return
 
         game = find_game(after.activities)
