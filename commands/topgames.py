@@ -4,6 +4,7 @@ import sqlite3
 from operator import itemgetter
 import discord
 from config.config import EMBED_COLOUR, EMBED_URL
+import math
 
 def topgames(month, conn): 
     #invoked when topgames command is typed into discord
@@ -24,18 +25,19 @@ def topgames(month, conn):
    totals = map(lambda x: x/3600, totals) # converts all the totals to hours
 
 
-   game_totals = list(zip(games,totals)) #zips totals with the games then turns it back into a list because it works
+   game_totals = zip(games,totals) #zips totals with the games then turns it back into a list because it works
    game_totals = [i for i in game_totals if i[0] != "Spotify" ]# remove spotify
    game_totals = sorted(game_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
-   game_totals = game_totals[:10] # only displays top ten games
 
    title= "Top %s games played in %s:\n" % ("10", month.lower())
 
    #begin constructing message
    i = 1
    content = ""
-   for game in game_totals:
-      content += '%d: %s - {0:.2f} hours\n\n'.format(game[1]) % (i, game[0])
+   for game, time in game_totals:
+      hours = math.floor(time)
+      minutes = round((time - hours)*60)
+      content += '{}: {} - {} hours {} minutes\n\n'.format(i, game, hours, minutes)
       i += 1
 
       if i > 10:

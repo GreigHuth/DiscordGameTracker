@@ -4,6 +4,7 @@ from discord.utils import find
 import datetime
 from config.config import EMBED_COLOUR, EMBED_URL
 from operator import itemgetter
+import math
 
 def topusers(month, channel, conn):
     # command that displays the top users of the given month in terms of game time
@@ -26,13 +27,10 @@ def topusers(month, channel, conn):
         
     totals = map(lambda x: x/3600, totals) # converts all the times into hours
 
-    user_totals = list(zip(users,totals))
+    user_totals = zip(users,totals)
     user_totals = [i for i in user_totals if i[0] != "Spotify" ] # remove spotify
     user_totals = sorted(user_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
-    user_totals = user_totals[:10] # only displays top ten
 
-    print(user_totals)
-    
     
     title = "Top %s gamers in %s:\n" % ("10", month.lower())
  
@@ -40,12 +38,14 @@ def topusers(month, channel, conn):
     #begin constructing message
     i = 1
     content = ""
-    for user_id, total in user_totals:
+    for user_id, time in user_totals:
         name = get_name(user_id, channel.guild)
-
         if name == None:
-            return discord.Embed(title=title, type="rich", description=content, colour=EMBED_COLOUR)
-        content += '%d: %s - {0:.2f} hours\n\n'.format(total) % (i, str(name))
+            continue
+        
+        hours = math.floor(time)
+        minutes = round((time - hours)*60)
+        content += '{}: {} - {} hours {} minutes\n\n'.format(i, str(name), hours, minutes)   
         i += 1
 
         if i > 10:

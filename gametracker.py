@@ -12,6 +12,7 @@ import random
 
 from config.config import GODS
 from config.config import CATEGORY
+from config.config import OPTOUT
 
 from generate_output import generate_output
 from user import User
@@ -21,9 +22,9 @@ INTERVAL = 5
 
 #HELPER functions
 
-#given a tuple of "activities" the function will return the relevant Game object if the 
-#   user is playing a game and return nothing otherwise
-#returns a string if the user is playing a game and None otherwise
+
+
+#if finds a game activity if it exists
 def find_game(activities):
 # if the activities is a tuple check all the elements to work out if one of them is a game
 
@@ -63,6 +64,11 @@ class gametracker(discord.Client):
         #create the task and run it in the background
         self.bg_task = self.loop.create_task(self.update_times())
 
+    def filter_optout(self, member):
+            #filter out optout
+        for role in member.roles:
+            if role.id == OPTOUT:
+                return True
 
     async def on_ready(self):
 
@@ -78,8 +84,10 @@ class gametracker(discord.Client):
         #scrape all the users to see if they are already playing games, if they are, start tracking them
         print("Scanning server for gamers...")
         for guild in self.guilds:
-            print(guild.members)
             for member in guild.members:
+                if self.filter_optout(member):
+                    print("ignoring user {}".format(member.id))
+                    continue
                 if member.bot == True:
                     continue
                 else:
@@ -98,6 +106,9 @@ class gametracker(discord.Client):
 
     async def on_message(self, message):
 
+        if self.filter_optout(message.author):
+            print("ignoring user {}".format(message.author.id))
+            return
 
         #BREAKOUT ROOMS, ill move this somewhere else eventually
         if message.content.startswith('!breakout'):
@@ -145,9 +156,6 @@ class gametracker(discord.Client):
         if message.author.bot == True:
             return
 
-
-        #TODO: Commands need re-implemented
-        #only do stuff if the message is actually a command
         
         try:
             if message.content.split()[0] in self.COMMANDS :
@@ -162,8 +170,10 @@ class gametracker(discord.Client):
     # after  -  the state of the user after the update 
     async def on_member_update(self, before, after):
 
-        if after.bot == True or before.bot == True:  # if the user is a bot ignore it
-            pass
+        #ignore user if they have the optout role
+        if self.filter_optout(after) == True:
+            print("ignoring user {}".format(after.id))
+            return
 
         game = find_game(after.activities)
         user = User(str(after.id), game)
@@ -180,7 +190,7 @@ class gametracker(discord.Client):
                 await self.add_user(user)
 
             if find_game(before.activities) == find_game(after.activities):
-                pass
+                return
             
             else:
                 print("%s started playing %s" % (user.id, user.game))
