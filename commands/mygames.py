@@ -4,6 +4,7 @@ import discord
 import datetime
 from config.config import EMBED_COLOUR, EMBED_URL
 from operator import itemgetter
+import math
 
 
 #command that lets people see thier own personal gametimes
@@ -30,8 +31,12 @@ def mygames(user_id, month, conn):
     title = "Top 10 games youve played in %s:\n" %(month.lower()) 
     i = 1
     content = ""
+
+    
     for game, time  in game_totals:
-        content += "%d: %s - {0:.2f}hours \n\n".format(time) % (i,game)
+        hours = math.floor(time)
+        minutes = round((time - hours)*60)
+        content += "{}: {} - {} hours {} minutes  \n\n".format(i,game,hours,minutes) 
         i += 1
 
         if i > 10:

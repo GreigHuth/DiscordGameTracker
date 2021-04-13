@@ -21,6 +21,7 @@ logger.addHandler(handler)
 
 # TODO
 # optimise the commands
+# make commands  more object oriented
 # restructure database
 # 
 
