@@ -4,7 +4,8 @@ import sys
 from gametracker import gametracker
 from config.config import TOKEN
 
-intents = discord.Intents(presences=True,messages=True,members=True, guilds=True, voice_states=True)
+intents = discord.Intents(presences=True,messages=True,members=True, guilds=True, voice_states=True, dm_messages=True)
+
 
 #logging shite
 logger = logging.getLogger('discord')

@@ -14,15 +14,13 @@ from config.config import GODS
 from config.config import CATEGORY
 from config.config import OPTOUT
 
-from generate_output import generate_output
+from commands import *
 from user import User
 
 #interval at which the update database script runs abd therefor how much the database should be updated with
 INTERVAL = 5
 
 #HELPER functions
-
-
 
 #if finds a game activity if it exists
 def find_game(activities):
@@ -50,7 +48,8 @@ def find_game(activities):
 
 class gametracker(discord.Client):
 
-    COMMANDS = ["!topgames", "!topusers", "!help", "!mygames"]
+    commands = {}
+    FILTER = {"Spotify"}
 
     # dict <users id, class representing user>
     currently_playing = {}
@@ -97,6 +96,12 @@ class gametracker(discord.Client):
                         #print("%s is playing %s" % (user.id, user.game))
                         await self.add_user(user)
 
+        #initialise commands
+        self.commands = {"!mygames" : mygames(self.conn, self.FILTER),
+                         "!topusers": topusers(self.conn, self.FILTER),
+                         "!topgames": topgames(self.conn, self.FILTER)
+                        }
+
         print("scanning finished")
         print("The bot is ready!")
 
@@ -106,6 +111,22 @@ class gametracker(discord.Client):
 
     async def on_message(self, message):
 
+        uid = message.author.id
+
+        # dont trigger on own messages
+        if uid == self.user.id:  
+            return
+
+        if message.author.bot == True:
+            return
+
+        raw = message.content.split()[0]
+
+        #if message doesnt start with ! then ignore it
+        if not raw.startswith("!"):
+            return
+
+        #filter out users with OPTOUT role
         if self.filter_optout(message.author):
             print("ignoring user {}".format(message.author.id))
             return
@@ -123,10 +144,9 @@ class gametracker(discord.Client):
             except IndexError: 
                 groups = 3
 
-            try:
-                #get all members in same vc as me
+            try: #get all members in same vc as me 
                 victims = message.author.voice.channel.members
-            except AttributeError: #if in not in a VC dont do anything
+            except AttributeError: #if the user is not in a VC dont do anything
                 return
 
             #shuffle victims to make sure its more random
@@ -150,17 +170,13 @@ class gametracker(discord.Client):
 
 
 
-        if message.author.id == self.user.id:  # dont trigger on own messages
-            return
-
-        if message.author.bot == True:
-            return
-
+        #TODO: Commands need re-implemented
+        #only do stuff if the message is actually a command
         
+
         try:
-            if message.content.split()[0] in self.COMMANDS :
-                output = generate_output(message, self.conn)
-                await message.channel.send(embed=output)
+            output = self.commands.get(raw).execute(user_id=uid) 
+            await message.channel.send(embed=output)
         except IndexError:
              return
 
