@@ -66,9 +66,12 @@ class gametracker(discord.Client):
 
     def filter_optout(self, member):
             #filter out optout
-        for role in member.roles:
-            if role.id == OPTOUT:
-                return True
+        try:
+            for role in member.roles:
+                if role.id == OPTOUT:
+                    return True
+        except AttributeError:
+            return None
 
     async def on_ready(self):
 
