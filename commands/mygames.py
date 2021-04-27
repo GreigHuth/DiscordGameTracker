@@ -1,25 +1,29 @@
-import sqlite3
-from discord.utils import find
-import discord
 from datetime import datetime
-from config.config import EMBED_COLOUR, EMBED_URL
+from discord.utils import find
 from operator import itemgetter
+
 import math
+import sqlite3
+import discord
+import math
+
 
 from .Command import Command
 
 
 class mygames(Command):
 
-    def __init__(self, conn, g_filter):
-        super().__init__(conn, g_filter)
+    def __init__(self, conn, game_filter):
+        super().__init__(conn, game_filter)
 
     #command that lets people see thier own personal gametimes
-    def execute(self,user_id):
+    def execute(self, args):
+
+        uid =  args[0]
 
         month = datetime.now().strftime("%B").upper()
 
-        cursor = self.conn.execute('select * from ' +month+ ' where ID = ' +user_id) #gets all the times for the user who issued the command
+        cursor = self.conn.execute('select * from {} where ID = {}'.format(month, str(uid))) #gets all the times for the user who issued the command
         times = list(cursor.fetchall()[0]) # puts the times in a list and makes them integers
         times.pop(0) # removes ID
         times =  map(lambda x: x/3600, times) # converts all the times from seconds to hours 
@@ -31,7 +35,7 @@ class mygames(Command):
 
 
         game_totals = zip(games,times) 
-        game_totals = [i for i in game_totals if i[0] not in self.filter] # removes spotify
+        game_totals = [i for i in game_totals if i[0] not in self.filter] # removes games in filter
         game_totals = [i for i in game_totals if i[1] > 0] # removes all the zero entries
         game_totals = sorted(game_totals,key=itemgetter(1), reverse = True) # sorts the list in descending order
 
@@ -40,7 +44,7 @@ class mygames(Command):
         
         body = self.construct_response(game_totals)
 
-        message = discord.Embed(title=title, type="rich", description=body, colour=self.EMBED_COLOUR)
+        message = discord.Embed(title=title, type="rich", description=body, colour=self.embed_colour)
 
         
 

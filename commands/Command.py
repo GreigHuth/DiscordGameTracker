@@ -1,18 +1,18 @@
+from abc import abstractmethod
 from config.config import EMBED_COLOUR, EMBED_URL
 import math
-from abc import abstractmethod
-
 class Command:
     
 
     def __init__(self, conn, g_filter):
         self.max = 10 #max number of things outputted when the command is called
         self.conn = conn #database connection
-        self.EMBED_COLOUR = EMBED_COLOUR
+        self.embed_colour = EMBED_COLOUR
+        self.embed_url = EMBED_URL
         self.filter = g_filter # list of games to filter out of output
 
     @abstractmethod
-    def execute(self, user_id):
+    def execute(self, args):
         pass
 
         #builds the message returned by mygames and topgames, topusers is a special case
@@ -30,6 +30,5 @@ class Command:
                 
                 return response   
         
-
 
 

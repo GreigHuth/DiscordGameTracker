@@ -1,0 +1,4 @@
+#!/bin/bash
+
+CONFIG_FILE=./config/config.py
+DATABASE_FILE

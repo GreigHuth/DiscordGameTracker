@@ -21,10 +21,9 @@ logger.addHandler(handler)
 
 
 # TODO
-# optimise the commands
-# make commands  more object oriented
+# make filter user configurable
 # restructure database
-# 
+# update bot to track users on a per day basis rather than per month
 
 
 if TOKEN == "":

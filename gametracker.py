@@ -18,31 +18,8 @@ from commands import *
 from user import User
 
 #interval at which the update database script runs abd therefor how much the database should be updated with
-INTERVAL = 5
+INTERVAL = 1
 
-#HELPER functions
-
-#if finds a game activity if it exists
-def find_game(activities):
-# if the activities is a tuple check all the elements to work out if one of them is a game
-
-    if (isinstance(activities, tuple)):
-        for i in range(len(activities)):
-            if isinstance(activities[i], discord.Game):
-                return re.sub(r'\W+','',str(activities[i]))
-            if isinstance(activities[i], discord.Activity):
-                return re.sub(r'\W+','',str(activities[i].name))
-
-        #if a game cant be found return false
-        return None
-
-
-
-    # if its not a tuple still check it
-    elif isinstance(activities, discord.Game):
-        return re.sub(r'\W+','',str(activities))
-
-    return None
 
 
 
@@ -63,13 +40,13 @@ class gametracker(discord.Client):
         #create the task and run it in the background
         self.bg_task = self.loop.create_task(self.update_times())
 
-    def filter_optout(self, member):
-            #filter out optout
-        for role in member.roles:
-            if role.id == OPTOUT:
-                return True
 
-    async def on_ready(self):
+
+
+    #------------------DISCORD COROUTINES--------------------------
+
+
+    async def on_ready(self): 
 
          #attempt to connect to db, throw exception if cannot
         try:
@@ -90,16 +67,18 @@ class gametracker(discord.Client):
                 if member.bot == True:
                     continue
                 else:
-                    game = find_game(member.activities)
+                    game = self.find_game(member.activities)
                     if game :
                         user = User(member.id, game)
                         #print("%s is playing %s" % (user.id, user.game))
                         await self.add_user(user)
 
         #initialise commands
-        self.commands = {"!mygames" : mygames(self.conn, self.FILTER),
-                         "!topusers": topusers(self.conn, self.FILTER),
-                         "!topgames": topgames(self.conn, self.FILTER)
+        self.commands = {
+                        "!mygames" : mygames(self.conn, self.FILTER),
+                        "!topusers": topusers(self.conn, self.FILTER),
+                        "!topgames": topgames(self.conn, self.FILTER),
+                        "!help"    : bot_help()
                         }
 
         print("scanning finished")
@@ -108,28 +87,23 @@ class gametracker(discord.Client):
 
     # coroutine that runs whenever a message is sent to any channel in the server
     # message - class representing the message sent, contains details about the author, channel, etc 
-
-    async def on_message(self, message):
+    async def on_message(self, message): 
 
         uid = message.author.id
 
-        # dont trigger on own messages
-        if uid == self.user.id:  
-            return
+        raw = message.content #raw text from message
 
-        if message.author.bot == True:
-            return
-
-        raw = message.content.split()[0]
-
-        #if message doesnt start with ! then ignore it
-        if not raw.startswith("!"):
+        # dont trigger on any of these
+        if uid == self.user.id or message.author.bot == True or not raw.startswith("!"):  
             return
 
         #filter out users with OPTOUT role
         if self.filter_optout(message.author):
             print("ignoring user {}".format(message.author.id))
             return
+
+
+        
 
         #BREAKOUT ROOMS, ill move this somewhere else eventually
         if message.content.startswith('!breakout'):
@@ -149,7 +123,7 @@ class gametracker(discord.Client):
             except AttributeError: #if the user is not in a VC dont do anything
                 return
 
-            #shuffle victims to make sure its more random
+            #shuffle victims to make sure its random
             random.shuffle(victims)
 
             #list of all voice channels
@@ -167,18 +141,27 @@ class gametracker(discord.Client):
                 print ("moving %s to %s" % (v, index))
                 await v.edit(voice_channel=channels[rooms[index]])    
                 i = i+1
+            
+            return # return after breakout is done
 
-
-
-        #TODO: Commands need re-implemented
-        #only do stuff if the message is actually a command
         
+        args = {}
+
+        if  raw  == "!mygames":
+            args[0] = uid   
+        
+        elif raw == "!topusers":
+            args[0] =  message.channel
+
+        elif raw == "!topgames":
+            args[0] = None
 
         try:
-            output = self.commands.get(raw).execute(user_id=uid) 
+            output = self.commands.get(raw).execute(args=args) # exectute command 
             await message.channel.send(embed=output)
-        except IndexError:
-             return
+        except AttributeError:#except when trying to access command that doesnt exist
+            return
+        
 
 
     # coroutine that runs whenever a member updates thier activity status game or customs status
@@ -191,7 +174,7 @@ class gametracker(discord.Client):
             print("ignoring user {}".format(after.id))
             return
 
-        game = find_game(after.activities)
+        game = self.find_game(after.activities) # game user is now playing, None if user is not playing anything
         user = User(str(after.id), game)
 
 #        print("user started playing game")
@@ -199,13 +182,13 @@ class gametracker(discord.Client):
         if not (game == None):
             
             #if the user is playing a different game than before then remove it and re-add it
-            if (after.id in self.currently_playing) and self.currently_playing[after.id].game != find_game(after.activities):
+            if (after.id in self.currently_playing) and self.currently_playing[after.id].game != self.find_game(after.activities):
                 await self.remove_user(user)
 
                 self.last_update = time.time()
                 await self.add_user(user)
 
-            if find_game(before.activities) == find_game(after.activities):
+            if self.find_game(before.activities) == self.find_game(after.activities):#user has not stopped playing a game so do nothing
                 return
             
             else:
@@ -215,17 +198,42 @@ class gametracker(discord.Client):
         
             
 
-                
-
         #if they arent playing a game then check if they were, if they were remove them from cp
         if game == None:
             if str(after.id) in self.currently_playing:
-                #print("%s stopped playing %s" % (user.id, find_game(before.activities)))
                 await self.remove_user(user)
-                
-        
 
-    #function to run and update the database every 5 seconds
+    
+    #------------------HELPER FUNCTIONS----------------------
+    def filter_optout(self, member):
+            #filter out optout
+        for role in member.roles:
+            if role.id == OPTOUT:
+                return True
+
+
+    def find_game(self, activities):
+    # if the activities is a tuple check all the elements to work out if one of them is a game
+
+        if (isinstance(activities, tuple)):
+            for i in range(len(activities)):
+                if isinstance(activities[i], discord.Game):
+                    return re.sub(r'\W+','',str(activities[i]))
+                if isinstance(activities[i], discord.Activity):
+                    return re.sub(r'\W+','',str(activities[i].name))
+
+            #if a game cant be found return false
+            return None
+
+
+
+        # if its not a tuple still check it
+        elif isinstance(activities, discord.Game):
+            return re.sub(r'\W+','',str(activities))
+
+        return None              
+
+    #function to run and update the database every second
     async def update_times(self):
 
         await self.wait_until_ready()
