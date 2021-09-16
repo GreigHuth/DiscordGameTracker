@@ -1,9 +1,12 @@
 from commands.topgames import topgames
 from commands.topusers import topusers
 from commands.mygames import mygames
+from config.config import EMBED_COLOUR
+
 import re
 import sys
 import datetime
+import discord
 
 
 
@@ -18,11 +21,12 @@ def generate_output(command, conn):
     except  IndexError:
         month =  datetime.datetime.now().strftime("%B").upper()
 
-    #remove all non-alphanumeric characters to stop those sneaky hackers
+    # Remove all non-alphanumeric characters to stop those sneaky hackers
     month = re.sub(r'\W+', '', month)
 
 
-    #i should clean this up
+
+    # I should clean this up
     if split_message[0] ==  '!topgames':
         output_message = topgames(month, conn)
 
@@ -30,7 +34,7 @@ def generate_output(command, conn):
         output_message = topusers(month, command.channel, conn)
 
     if split_message[0] ==  '!help':
-        output_message = "there is no help"
+        output_message = discord.Embed(title="Help", type="rich", description="there is no help!", colour=EMBED_COLOUR)
 
     if split_message[0] ==  '!mygames':
         output_message = mygames(str(command.author.id), month, conn)
