@@ -9,6 +9,7 @@ import discord
 import logging 
 import asyncio
 import random
+import urllib.request
 
 from config.config import GODS
 from config.config import CATEGORY
@@ -17,14 +18,13 @@ from config.config import OPTOUT
 from generate_output import generate_output
 from user import User
 
-#interval at which the update database script runs abd therefor how much the database should be updated with
+# interval at which the update database script runs abd therefor how much the database should be updated with
 INTERVAL = 5
 
 #HELPER functions
 
 
-
-#if finds a game activity if it exists
+# if finds a game activity if it exists
 def find_game(activities):
 # if the activities is a tuple check all the elements to work out if one of them is a game
 
@@ -35,7 +35,7 @@ def find_game(activities):
             if isinstance(activities[i], discord.Activity):
                 return re.sub(r'\W+','',str(activities[i].name))
 
-        #if a game cant be found return false
+        # if a game cant be found return false
         return None
 
 
@@ -51,6 +51,7 @@ def find_game(activities):
 class gametracker(discord.Client):
 
     COMMANDS = ["!topgames", "!topusers", "!help", "!mygames"]
+    
 
     # dict <users id, class representing user>
     currently_playing = {}
@@ -61,11 +62,11 @@ class gametracker(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        #create the task and run it in the background
+        # create the task and run it in the background
         self.bg_task = self.loop.create_task(self.update_times())
 
     def filter_optout(self, member):
-            #filter out optout
+            # filter out optout
         try:
             for role in member.roles:
                 if role.id == OPTOUT:
@@ -73,18 +74,29 @@ class gametracker(discord.Client):
         except AttributeError:
             return None
 
+    
+    async def get_avatar(self,message):
+
+        # fetch avatar and store it locally
+        # call `.save("avatar.jpg")` to store them locally
+        
+        await usr_avatar = message.author.avatar_url 
+        return usr_avatar
+        
     async def on_ready(self):
 
-         #attempt to connect to db, throw exception if cannot
+         # attempt to connect to db, throw exception if cannot
         try:
             print("Connecting to database...")
-            self.conn = sqlite3.connect("file:gt"+datetime.now().strftime("%Y")+".db?mode=rw", uri=True) #connection to db
+
+            # connection to db
+            self.conn = sqlite3.connect("file:gt"+datetime.now().strftime("%Y")+".db?mode=rw", uri=True) 
         except:
             sys.exit("No database file detected, make a file called gt<current year>.db")
 
         print("Database connection successful!")
 
-        #scrape all the users to see if they are already playing games, if they are, start tracking them
+        # scrape all the users to see if they are already playing games, if they are, start tracking them
         print("Scanning server for gamers...")
         for guild in self.guilds:
             for member in guild.members:
@@ -97,7 +109,7 @@ class gametracker(discord.Client):
                     game = find_game(member.activities)
                     if game :
                         user = User(member.id, game)
-                        #print("%s is playing %s" % (user.id, user.game))
+                        # print("%s is playing %s" % (user.id, user.game))
                         await self.add_user(user)
 
         print("scanning finished")
@@ -113,35 +125,35 @@ class gametracker(discord.Client):
             print("ignoring user {}".format(message.author.id))
             return
 
-        #BREAKOUT ROOMS, ill move this somewhere else eventually
+        # BREAKOUT ROOMS, ill move this somewhere else eventually
         if message.content.startswith('!breakout'):
             if message.author.id not in GODS:
                 await message.channel.send("fuck you")
 
             args = message.content.split()
         
-            #default number of groups is 3
+            # default number of groups is 3
             try: 
                 groups = int(args[1])
             except IndexError: 
                 groups = 3
 
             try:
-                #get all members in same vc as me
+                # get all members in same vc as me
                 victims = message.author.voice.channel.members
             except AttributeError: #if in not in a VC dont do anything
                 return
 
-            #shuffle victims to make sure its more random
+            # shuffle victims to make sure its more random
             random.shuffle(victims)
 
-            #list of all voice channels
+            # list of all voice channels
             channels = message.guild.voice_channels
 
-            #remove channels that arent in the specified category
+            # remove channels that arent in the specified category
             channels = [x for x in channels if x.category_id == CATEGORY]
 
-            #random indexes corresponding to all_channels
+            # random indexes corresponding to all_channels
             rooms = random.sample(range(0, len(channels) ), groups)
 
             i = 0
@@ -159,11 +171,27 @@ class gametracker(discord.Client):
         if message.author.bot == True:
             return
 
-        
+       
+
         try:
             if message.content.split()[0] in self.COMMANDS :
+                # call get_avatar
+                # await self.get_avatar(message)
+
                 output = generate_output(message, self.conn)
+                
+                # function that changes the bot's pfp, unused
+                '''
+                usr_avatar = open("avatar.jpg", 'rb')
+
+                # read() is necessary
+
+                await self.user.edit(avatar = usr_avatar.read())
+                usr_avatar.close()
+                '''
+
                 await message.channel.send(embed=output)
+
         except IndexError:
              return
 
@@ -186,7 +214,9 @@ class gametracker(discord.Client):
         if not (game == None):
             
             #if the user is playing a different game than before then remove it and re-add it
-            if (after.id in self.currently_playing) and self.currently_playing[after.id].game != find_game(after.activities):
+            if (after.id in self.currently_playing);
+                and self.currently_playing[after.id].game != find_game(after.activities):
+
                 await self.remove_user(user)
 
                 self.last_update = time.time()
@@ -204,31 +234,32 @@ class gametracker(discord.Client):
 
                 
 
-        #if they arent playing a game then check if they were, if they were remove them from cp
+        # If they arent playing a game then check if they were, if they were remove them from cp
         if game == None:
             if str(after.id) in self.currently_playing:
-                #print("%s stopped playing %s" % (user.id, find_game(before.activities)))
+                # print("%s stopped playing %s" % (user.id, find_game(before.activities)))
                 await self.remove_user(user)
                 
         
 
-    #function to run and update the database every 5 seconds
+    # function to run and update the database every 5 seconds
     async def update_times(self):
 
         await self.wait_until_ready()
         while not self.is_closed():
-            #print("updating database")
+            # print("updating database")
 
-            #current month
+            # Current month
             month = datetime.now().strftime("%B").upper()
 
-            #if the database connection doesn't exist yet then ignore this task
+            # If the database connection doesn't exist yet then ignore this task
             if self.conn:
 
-                #iterate through list of current players and update the database accordingly
+                # Iterate through list of current players and update the database accordingly
                 c = self.conn
+
                 for uid, user in self.currently_playing.items():
-                    #print("Updating info for user %s"% uid)
+                    # print("Updating info for user %s"% uid)
                     
                     c.execute('create table if not exists '+month+' (ID text PRIMARY KEY);' )# creates table for new month
 
@@ -241,8 +272,8 @@ class gametracker(discord.Client):
                     users = [i[0] for i in list(cursor)]
 
                     if user.game.lower() not in games:
-                        #print(user.game)
-                       # print("%s game not found adding to database" % user.game)
+                       #  print(user.game)
+                       #  print("%s game not found adding to database" % user.game)
                         self.add_game_db(user.game, c, month) # adds new game if not already in db
 
                     if user.id not in users:
@@ -253,7 +284,7 @@ class gametracker(discord.Client):
                 
 
                 c.commit()
-                #print("database updated")
+                # print("database updated")
             
             else:
                 print("no database connection, skipping.")
@@ -290,14 +321,11 @@ class gametracker(discord.Client):
         c.commit()
 
 
-    #add user to list of tracked players, als returns the time they were added
+    # add user to list of tracked players, als returns the time they were added
     async def add_user(self, user):
         self.currently_playing[user.id] = user
 
 
-    #remove user from list of tracker players
+    # remove user from list of tracker players
     async def remove_user(self, user):
         del self.currently_playing[user.id]
-
-    
-
