@@ -59,7 +59,7 @@ GameTracker was built to achieve two things:
 
 **Then, run:**
 
-`python gametracker.py`
+`python main.py`
 
 ## Known Issues
 1. The bot is not 100% accurate not quite worked out the root cause but its inconsitent to say the least
